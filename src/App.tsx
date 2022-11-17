@@ -4,32 +4,41 @@ import {Todolist} from './Todolist';
 
 function App() {
 
-    let [ tasks1, setTask] =useState([
-            { id: 1, title: "HTML&CSS", isDone: true },
-            { id: 2, title: "JS", isDone: true },
-            { id: 3, title: "ReactJS", isDone: false }
+    let [tasks1, setTask] = useState([
+            {id: 1, title: "HTML&CSS", isDone: true},
+            {id: 2, title: "JS", isDone: true},
+            {id: 3, title: "ReactJS", isDone: false}
         ]
     )
-    const removeTsk = (id:number)=> {
-        tasks1=tasks1.filter((el)=>el.id!==id)
+    const removeTsk = (id: number) => {
+        tasks1 = tasks1.filter((el) => el.id !== id)
         setTask(tasks1)
     }
 
+    const [Button, setButton] = useState('All')
 
-let [nameButton,setButton]=useState('All')
-
-    if(nameButton==='Active'){ tasks1=tasks1.filter((el)=>el.isDone===true)}
-    if(nameButton==='Completed'){ tasks1=tasks1.filter((el)=>el.isDone===false)}
-
-
-    const  callbackButton = (nameButton:string)=> {
-
-       setButton(nameButton)
-
+    const callBackButton = (nameButton: string) => {
+        setButton(nameButton)
     }
+
+
+    const FilterButton = () => {
+
+        let filtredTask = tasks1
+        if (Button === 'Active') {
+            filtredTask = tasks1.filter((el) => el.isDone)
+        }
+        if (Button === 'Completed') {
+            filtredTask = tasks1.filter((el) => !el.isDone)
+        }
+        return filtredTask
+    }
+
+
     return (
         <div className="App">
-            <Todolist title="What to learn" tasks={tasks1} callback={removeTsk} callbackButton={callbackButton} />
+            <Todolist title="What to learn" tasks={FilterButton()} callback={removeTsk}
+                      callbackButton={callBackButton}/>
 
         </div>
     );

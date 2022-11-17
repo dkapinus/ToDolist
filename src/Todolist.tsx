@@ -6,6 +6,7 @@ type PropsType = {
     tasks: Array<TaskType>
     callback:(id:number)=>void;
     callbackButton:(nameButton:string)=>void
+
 }
 
 type TaskType = {
@@ -16,9 +17,13 @@ type TaskType = {
 
 export function Todolist(props: PropsType) {
 
-    const onClickHandler =(nameButton:string) =>{
+
+
+
+    const onClickHandler = (nameButton:string)=> {
         props.callbackButton(nameButton)
     }
+
     return <div>
         <h3>{props.title}</h3>
         <div>
