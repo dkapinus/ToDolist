@@ -1,23 +1,23 @@
 import React from 'react';
+import s from './Button.module.css';
 
-type ButtonType = {
-    nameButton : string;
-    callback:()=>void;
+
+type ComponentButtonType = {
+nameButton:string;
+started:()=>void;
+active?:boolean;
+
 }
 
 
-
-export const Button = (props:ButtonType) => {
-
-    const onClickHandler =()=> {
-        props.callback()
+export const Button = (props:ComponentButtonType) => {
+    const Started = ()=>{
+        props.started()
     }
     return (
-       <span>
-           <button onClick={onClickHandler}>{props.nameButton}</button>
 
-       </span>
+   <button className={ props.active  ? s.activeButton:''} onClick={Started}>{props.nameButton}</button>
+
     );
 };
-
 

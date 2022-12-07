@@ -1,0 +1,15 @@
+.errorMessage{
+    color: red;
+}
+
+.error {
+    border: red 1px solid;
+}
+
+.activeButton {
+    background-color: #61dafb;
+}
+
+.isDone {
+    opacity: 0.5;
+}

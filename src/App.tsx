@@ -1,7 +1,10 @@
 import React,{useState} from 'react';
 import './App.css';
-import {ToDolist} from "./ToDolist";
 import {v1} from 'uuid'
+import {Todolist} from "./Todolist";
+
+
+export type ButtonType ='All'|'Active'|'Completed'
 
 function App() {
   let [tasks, setTasks] = useState([
@@ -12,39 +15,41 @@ function App() {
     {id: v1(), title: "GraphQL", isDone: false},
   ]);
 
-  const addMessage = (valueInput:string)=> {
-    let newTasks ={id: v1(), title: valueInput, isDone: true}
-    setTasks([newTasks,...tasks])
-  }
 
-const deleteButton = (id:string)=> {
 
-  let deleteButton=tasks.filter((el)=>el.id !==id)
-  setTasks(deleteButton)
+const removeTask = (id:string)=> {
+let newTask=tasks.filter((el)=>el.id!=id)
+  setTasks(newTask)
 }
 
-let [NameButton,setNameButton]=useState('All')
+let [nameButton,setNameButton]=useState<ButtonType>('All')
 
-const addNameButton = (nameButton:string)=> {
-  setNameButton(nameButton)
+const ChangeFilter = (nameButton:ButtonType)=> {
+setNameButton(nameButton)
 }
 
-const FilteredTasks = ()=> {
-  let filtered=tasks
-  if(NameButton==='Active')(filtered=tasks.filter((el)=>el.isDone ===true))
-  if(NameButton==='Completed')(filtered=tasks.filter((el)=>el.isDone===false))
-  return filtered
+const Filtered = ()=> {
+  let filteredTask=tasks
+  if(nameButton==='Active'){filteredTask=tasks.filter((el)=>el.isDone===false)}
+  if(nameButton==='Completed'){filteredTask=tasks.filter((el)=>el.isDone===true)}
+  return filteredTask
 }
 
+const AddMessage = (inputValue:string)=> {
+  let newTask={id: v1(), title: inputValue, isDone: true}
+  setTasks([newTask,...tasks])
+}
+const InputCheck = (event:boolean,id:string)=> {
+  setTasks(tasks.map((el)=>el.id=== id ? {...el,isDone:event}:el))
 
-
-
-
-
+}
   return (
     <div className="App">
-    <ToDolist title={'What to learn'}  task={FilteredTasks()} deleteButton={deleteButton} addNameButton={addNameButton}
-              addMessage={addMessage}/>
+   <Todolist task={Filtered()} name={'What to learn'} removeTask={removeTask}
+             ChangeFilter={ChangeFilter}
+             addMessage={AddMessage}
+             InputCheck={InputCheck}
+   Filter={nameButton}/>
     </div>
   );
 }
