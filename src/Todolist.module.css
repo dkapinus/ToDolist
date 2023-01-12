@@ -1,15 +1,15 @@
-.errorMessage{
+.errorMessage {
     color: red;
 }
 
-.error {
-    border: red 1px solid;
+.errorInput {
+   border: 1px solid red;
 }
 
-.activeButton {
-    background-color: #61dafb;
+.filter {
+background-color: aquamarine;
 }
 
-.isDone {
+.active {
     opacity: 0.5;
 }
