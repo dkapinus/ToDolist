@@ -3,13 +3,15 @@ import {ButtonFilterType} from "./App";
 import s from './Todolist.module.css'
 
 type  TodolistType = {
-    name:string
-    FilterNameButton:(nameButton:ButtonFilterType)=>void
-    removeTask:(id:string)=>void
-    AddMessage:(valueInput:string)=>void
-    onChangeCheckInput:(idCheck:string,event:boolean)=>void
+    todolistID:string
+    title:string
+    FilterNameButton:(todolistID:string,nameButton:ButtonFilterType)=>void
+    removeTask:(todolistID:string,id:string)=>void
+    AddMessage:(todolistID:string,valueInput:string)=>void
+    onChangeCheckInput:(todolistID:string,idCheck:string,event:boolean)=>void
     filter:ButtonFilterType
     task:TaskType[]
+    deleteTodolist:(todolistID:string)=>void
 }
 
 type TaskType = {
@@ -19,21 +21,22 @@ type TaskType = {
 }
 
 export const Todolist:React.FC<TodolistType> = ({
-                                                    name,
+                                                    title,
                                                     FilterNameButton,
                                                     removeTask,
                                                     AddMessage,
                                                     onChangeCheckInput,
                                                     filter,
                                                     task,
+                                                    deleteTodolist,
                                                     ...props
                                                 }) => {
-    const onClickHandler = (nameButton:ButtonFilterType)=> {
-        FilterNameButton(nameButton)
+    const onClickHandler = (todolistID:string,nameButton:ButtonFilterType)=> {
+        FilterNameButton(todolistID,nameButton)
     }
 
-    const  onClickHandlerDeleteTask= (id:string)=> {
-        removeTask(id)
+    const  onClickHandlerDeleteTask= (todolistID:string,id:string)=> {
+        removeTask(todolistID,id)
     }
 
     let [valueInput,setValueInput]=useState('')
@@ -44,8 +47,8 @@ export const Todolist:React.FC<TodolistType> = ({
 
     let [error,setError]=useState<string|null>('')
 
-    const onclickHandlerAddMessage = ()=> {
-        if(valueInput.trim()!==''){AddMessage(valueInput.trim())}
+    const onclickHandlerAddMessage = (todolistID:string)=> {
+        if(valueInput.trim()!==''){AddMessage(todolistID,valueInput.trim())}
         else (setError('Title is reqiured'))
 
         setValueInput('')
@@ -57,34 +60,39 @@ export const Todolist:React.FC<TodolistType> = ({
     }
 
     const onKeyDownInput = (event:KeyboardEvent<HTMLInputElement>)=> {
-        if(event.key==='Enter'){onclickHandlerAddMessage()}
+        if(event.key==='Enter'){onclickHandlerAddMessage(props.todolistID)}
     }
 
     const onKeyPressInput = (event:KeyboardEvent<HTMLInputElement>)=> {
-        if(event.key==='13'){onclickHandlerAddMessage()}
+        if(event.key==='13'){onclickHandlerAddMessage(props.todolistID)}
     }
 
-    const onChangeCheckInputHandler = (idCheck:string,event:boolean)=> {
-        onChangeCheckInput(idCheck,event)
+    const onChangeCheckInputHandler = (todolistID:string,idCheck:string,event:boolean)=> {
+        onChangeCheckInput(todolistID,idCheck,event)
+    }
+
+    const DeleteTodolist = (todolistID:string)=> {
+        deleteTodolist(todolistID)
     }
     return (
         <div>
-            <h3>{name}</h3>
+            <h3>{title}
+            <button onClick={()=>DeleteTodolist(props.todolistID)}>Delete Todolist</button></h3>
             <input  className={error ? s.errorInput :''} onChange={onChangeInputHandler} value={valueInput} onKeyDown={onKeyDownInput} onKeyPress={onKeyPressInput}/>
-            <button onClick={onclickHandlerAddMessage}>Add</button>
+            <button onClick={()=>onclickHandlerAddMessage(props.todolistID)}>Add</button>
             {error &&<div className={s.errorMessage}>{error}</div>}
             <ul>{task.map((el)=>{
                 return ( <li key={el.id} className={el.isDone===true ? s.active : ''}>
                     {el.title}
-                    <input type={"checkbox"} checked={el.isDone} onChange={(event:ChangeEvent<HTMLInputElement>)=>onChangeCheckInputHandler(el.id,event.currentTarget.checked)}  />
-                    <button onClick={()=>onClickHandlerDeleteTask(el.id)}>X</button>
+                    <input type={"checkbox"} checked={el.isDone} onChange={(event:ChangeEvent<HTMLInputElement>)=>onChangeCheckInputHandler(props.todolistID,el.id,event.currentTarget.checked)}  />
+                    <button onClick={()=>onClickHandlerDeleteTask(props.todolistID,el.id)}>X</button>
                 </li>)
             })}
 
             </ul>
-               <button className={filter==='All' ? s.filter :''} onClick={()=>onClickHandler('All')}>All</button>
-               <button className={filter==='Active' ? s.filter :''} onClick={()=>onClickHandler('Active')}>Active</button>
-               <button className={filter==='Completed' ? s.filter :''} onClick={()=>onClickHandler('Completed')}>Completed</button>
+               <button className={filter==='All' ? s.filter :''} onClick={()=>onClickHandler(props.todolistID,'All')}>All</button>
+               <button className={filter==='Active' ? s.filter :''} onClick={()=>onClickHandler(props.todolistID,'Active')}>Active</button>
+               <button className={filter==='Completed' ? s.filter :''} onClick={()=>onClickHandler(props.todolistID,'Completed')}>Completed</button>
 
         </div>
     );

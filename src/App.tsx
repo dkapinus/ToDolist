@@ -5,59 +5,95 @@ import {Todolist} from "./Todolist";
 
 export type ButtonFilterType ='All'|'Active'|'Completed'
 
-
+type TodoListsType = {id: string, title: string, filter: ButtonFilterType}
 
 function App() {
 
-    let [tasks, setTasks] = useState([
+    let todoListsID1=v1()
+    let todoListsID2=v1()
+
+    let [todoLists, SetTodoLists] = useState<TodoListsType[]>([
+        {id: todoListsID1, title: "Whats to learn", filter: "All"},
+        {id: todoListsID2, title: "Whats to buy", filter: "All"},
+
+    ])
+
+    let [tasks, setTasks] = useState({
+        [todoListsID1]:[
             {id: v1(), title: "HTML&CSS", isDone: true},
             {id: v1(), title: "JS", isDone: true},
             {id: v1(), title: "ReactJS", isDone: false},
             {id: v1(), title: "Rest API", isDone: false},
             {id: v1(), title: "GraphQL", isDone: false},
-        ])
+        ],
+        [todoListsID2]:[
+            {id: v1(), title: "HTML&CSS", isDone: true},
+            {id: v1(), title: "JS", isDone: true},
+            {id: v1(), title: "ReactJS", isDone: false},
+            {id: v1(), title: "Rest API", isDone: false},
+            {id: v1(), title: "GraphQL", isDone: false},
+        ],
+    });
 
-   let [filter,setFilter]=useState<ButtonFilterType>('All')
 
-         const FilterNameButton = (nameButton:ButtonFilterType)=> {
-        setFilter(nameButton)
+         const FilterNameButton = (todolistID:string,nameButton:ButtonFilterType)=> {
+
+             SetTodoLists(todoLists.map((el)=>el.id===todolistID ? {...el,filter:nameButton}: el))
+        // setFilter(nameButton)
         }
 
-    const FilteredTask=()=> {
-        let newTask=tasks
-        if(filter==='Active'){newTask=tasks.filter((el)=>el.isDone===false)}
-        if(filter==='Completed'){newTask=tasks.filter((el)=>el.isDone===true)}
-        return newTask
-    }
 
-    const removeTask = (id:string)=> {
 
-        let newTask=tasks.filter((el)=>el.id !==id)
-        setTasks(newTask)
+    const removeTask = (todolistID:string,id:string)=> {
+         setTasks({...tasks,[todolistID]:tasks[todolistID].filter((el)=>el.id !==id)})
+        // let newTask=tasks.filter((el)=>el.id !==id)
+        // setTasks(newTask)
     }
-    const AddMessage =(valueInput:string)=> {
+    const AddMessage =(todolistID:string,valueInput:string)=> {
         let newTask ={id: v1(), title: valueInput, isDone: true}
-        setTasks([newTask,...tasks])
+        setTasks({...tasks,[todolistID]:[newTask,...tasks[todolistID]]})
+        // setTasks([newTask,...tasks])
     }
 
 
-    const CheckInput=(idCheck:string,event:boolean)=> {
+    const CheckInput=(todolistID:string,idCheck:string,event:boolean)=> {
 
-         setTasks(tasks.map((el)=>el.id===idCheck ? {...el,isDone:event}:el))
+         // setTasks(tasks.map((el)=>el.id===idCheck ? {...el,isDone:event}:el))
+        setTasks({...tasks,[todolistID]:tasks[todolistID].map((el)=>el.id===idCheck ? {...el,isDone:event}:el)})
 
 
+    }
+
+    const deleteTodolist = (todolistID:string)=> {
+             SetTodoLists(todoLists.filter((el)=>el.id!==todolistID))
+        delete tasks[todolistID]
     }
     return (
         <div className="App">
-          <Todolist
+            {todoLists.map((el)=>{
+                const FilteredTask=()=> {
+                    let newTask=tasks[el.id]
+                    if(el.filter==='Active'){newTask=tasks[el.id].filter((el)=>el.isDone===false)}
+                    if(el.filter==='Completed'){newTask=tasks[el.id].filter((el)=>el.isDone===true)}
+                    return newTask
+                }
+                return(
+                    <div>
+                        <Todolist
+                            todolistID={el.id}
+                            key={el.id}
+                            title={el.title}
+                            task={FilteredTask()}
+                            FilterNameButton={FilterNameButton}
+                            removeTask={removeTask}
+                            AddMessage={AddMessage}
+                            filter={el.filter}
+                            onChangeCheckInput={CheckInput}
+                            deleteTodolist={deleteTodolist}/>
+                    </div>
+                )
+            })}
 
-                    name={'What to learn'}
-                    task={FilteredTask()}
-                    FilterNameButton={FilterNameButton}
-                    removeTask={removeTask}
-                    AddMessage={AddMessage}
-                    filter={filter}
-                    onChangeCheckInput={CheckInput}/>
 
         </div>
     );
