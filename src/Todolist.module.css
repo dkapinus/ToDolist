@@ -1,15 +1,15 @@
-.errorMessage {
+.error {
     color: red;
 }
 
-.errorInput {
-   border: 1px solid red;
+.errorMessage {
+    border-color: red;
 }
 
-.filter {
-background-color: aquamarine;
+.active_Button {
+    background: aqua;
 }
 
-.active {
+.active_task{
     opacity: 0.5;
 }
