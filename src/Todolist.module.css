@@ -1,15 +1,15 @@
-.error {
-    color: red;
+.error{
+color: red;
 }
 
-.errorMessage {
-    border-color: red;
+.error_message {
+    border: 2px solid red
 }
 
-.active_Button {
+.active {
     background: aqua;
 }
 
-.active_task{
+.Completed {
     opacity: 0.5;
 }

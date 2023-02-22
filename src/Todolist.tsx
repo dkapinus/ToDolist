@@ -1,86 +1,93 @@
-import React, {ChangeEvent} from 'react';
-import {FilterValuesType} from "./App";
-import s from './Todolist.module.css'
-import {Input} from "./Components/Input";
-import {EditableSpan} from "./Components/EditableSpan";
+import React from 'react';
+import {FilterValueType} from "./App";
+import s from  "./Todolist.module.css"
+import {SuperInput} from "./Components/SuperInput";
+import {EnableSpan} from "./Components/EnableSpan";
 
+type TodolistType = {
+    todolistID:string
+    title:string;
+    task:TaskType[]
+    removeTask:(todolistID:string,taskId:string)=>void
+    filteredTask:(todolistID:string,nameButton:FilterValueType)=>void
+    AddMessage:(todolistID:string,value:string)=>void
+    changeStatus:(todolistID:string,id:string,e:boolean)=>void
+    Filter:FilterValueType
+    deleteTodolist:(todolistID:string)=>void
+    changeTitleSpan:(todolistID:string,taskId:string,e:string)=>void
+}
 
-export type TaskTypeArray = {
+ export  type TaskType= {
     id:string;
     title:string;
     isDone:boolean
 }
 
-type TaskType = {
-    id:string
-    title:string
-    task:TaskTypeArray[]
-    FilterTask:(todolistId:string,nameButton:FilterValuesType)=>void
-    removeTask:(todolistId:string,taskId:string)=>void
-    changeStatus:(todolistId:string,id:string,e:boolean)=>void
-    addMessage:(todolistId:string,valueInput:string)=>void
-    filter:FilterValuesType
-    deleteTodolist:(todolistId:string)=>void
-    changeSpanTask:(todolistId:string,id:string,e:string)=>void
-    changeSpanTodolist:(todolistId:string,e:string)=>void
-}
 
 
 
-export  const Todolist:React.FC<TaskType> = ({id,title,task,
-                                                 FilterTask,removeTask,changeStatus,addMessage,filter, deleteTodolist,changeSpanTask,changeSpanTodolist,...props}) => {
-
-const onClickFilter= (nameButton:FilterValuesType)=>{
-    FilterTask(id,nameButton)
-}
 
 
+export  const Todolist:React.FC<TodolistType> = ({ todolistID,task,
+                                                     title,
+                                                     removeTask,filteredTask,
+                                                     AddMessage, changeStatus,
+                                                     Filter,deleteTodolist,
+                                                     changeTitleSpan,
+                                                     ...props}) => {
 
-    const ChangeStatus = (taskId:string,e:boolean)=> {
-        changeStatus(id,taskId,e)
 
+    const onClickHandlerRemoveTask = (todolistID:string,taskId:string)=> {
+        removeTask(todolistID,taskId)
     }
-        const AddNameTitle = (valueInput:string)=> {
-            addMessage(id,valueInput)
-       }
+
+    const onclickFilter = (todolistID:string,nameButton:FilterValueType)=> {
+       filteredTask(todolistID,nameButton)
+  }
 
 
-      const DeleteTodolist = ()=> {
-    deleteTodolist(id)
+
+     const onclickHandlerStatusInput = (todolistID:string,id:string,e:boolean)=> {
+       changeStatus(todolistID,id,e)
+}
+
+     const DeleteTodolist = (todolistID:string)=> {
+        deleteTodolist(todolistID)
       }
 
-    const DeleteTask = (taskId:string)=> {
-        removeTask(id,taskId)
-    }
-    const ChangeSpanTodolist = (e:string)=>{
-        changeSpanTodolist(id,e)
-    }
+      const AddMessageFunction = (value:string)=> {
+        AddMessage(todolistID,value)
+
+      }
+
 
     return (
         <div>
-            <h3><EditableSpan title={title} ChangeSpan={ChangeSpanTodolist}/>
-                <button onClick={DeleteTodolist}>DeleteTODOLIST</button>
+            <h3>{title}
+                <button onClick={()=>DeleteTodolist(todolistID)}>X</button>
             </h3>
-          <Input addMessage={AddNameTitle}/>
 
-            <ul>
-                {task.map((el)=>{
-                    const ChangeSpan=(e:string)=> {
-                        changeSpanTask(id,el.id,e)
-                    }
-                    return (
-                        <li key={el.id}>
-                            <EditableSpan title={el.title} ChangeSpan={ChangeSpan}/>
-                            <input className={el.isDone ? s.active_task :''} type={'checkbox'} onChange={(e:ChangeEvent<HTMLInputElement>)=>ChangeStatus(el.id,e.currentTarget.checked)} checked={el.isDone}/>
-                            <button onClick={()=>DeleteTask(el.id)}>X</button>
-                        </li>
-                    )
-                })}
-            </ul>
-            <button className={filter==='all'? s.active_Button:''} onClick={()=>onClickFilter('all')}>All</button>
-            <button className={filter==='active'? s.active_Button:''} onClick={()=>onClickFilter('active')}>Active</button>
-            <button className={filter==='completed'? s.active_Button:''} onClick={()=>onClickFilter('completed')}>Completed</button>
+               <SuperInput  AddMessage={AddMessageFunction}/>
+           <ul>{task.map((el)=>{
+               const ChangeTitleSpan = (e:string)=> {
+                   changeTitleSpan(todolistID,el.id,e)
+               }
+               return( <li key={el.id}  className={el.isDone ? s.Completed : ''}>
+                  <EnableSpan  titleSpan={ChangeTitleSpan}  title={el.title}/>
+                   <input  onChange={(e)=>onclickHandlerStatusInput(todolistID,el.id,e.currentTarget.checked)} type={"checkbox"} checked={el.isDone}/>
+                   <button onClick={()=>onClickHandlerRemoveTask(todolistID,el.id)}>X</button>
+               </li>)
+               })
+
+           }
+
+           </ul>
+
+            <button  className={Filter==='All' ? s.active: ''} onClick={()=>onclickFilter(todolistID,'All')}>All</button>
+            <button className={Filter==='Active' ? s.active: ''} onClick={()=>onclickFilter(todolistID,'Active')}>Active</button>
+            <button className={Filter==='Completed' ? s.active: ''} onClick={()=>onclickFilter(todolistID,'Completed')}>Completed</button>
         </div>
     );
+
 };
 
