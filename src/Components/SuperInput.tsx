@@ -1,42 +1,37 @@
 import React, {ChangeEvent, KeyboardEvent, useState} from 'react';
 import s from "../Todolist.module.css";
 
-type SuperInputTypes = {
-    AddMessage:(value:string)=>void
+type SuperInputType ={
+    addMessage:(value:string)=>void
 }
 
-
-export  const SuperInput:React.FC<SuperInputTypes> = ({ AddMessage,...props}) => {
+export  const SuperInput:React.FC<SuperInputType> = ({addMessage,...props}) => {
 
     const [value,SetValue]=useState('')
 
     const onChangeInput = (e:ChangeEvent<HTMLInputElement>)=> {
         SetValue(e.currentTarget.value)
-        SetError('')
     }
+    const [Error,SetError]=useState<string|null>('')
 
-    const [error,SetError]=useState('')
+    const AddMessage = ()=> {
+        if(value.trim()!==''){addMessage(value.trim())}
+        else (SetError('Title is requit'))
 
-    const onClickHandlerAddMessage = ()=> {
-        if(value.trim()!==''){AddMessage(value.trim()) }
-        else (SetError('Title is requiet'))
         SetValue('')
-
-
-
     }
 
-
-    const onKeyDown = (event:KeyboardEvent<HTMLInputElement>)=> {
-        if(event.key==='Enter'){onClickHandlerAddMessage()}
+    const onKeyDown = (e:KeyboardEvent<HTMLInputElement>)=> {
+        if(e.key==='Enter'){AddMessage()}
+        else ( SetError(''))
 
     }
     return (
-        <div>
-            <input className={error ? s.error_message : ''} onChange={onChangeInput} value={value} onKeyDown={onKeyDown}/>
-            <button onClick={()=>onClickHandlerAddMessage()}>Add</button>
-            {error && <div  className={s.error}>{error}</div>}
-        </div>
+        <>
+            <input className={Error ? s.error_message:''} onChange={onChangeInput} onKeyDown={onKeyDown} value={value}/>
+            <button onClick={AddMessage}>Add</button>
+            {Error &&<div className={Error ? s.error : ''}>{Error}</div>}
+        </>
     );
 };
 

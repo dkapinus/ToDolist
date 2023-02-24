@@ -1,72 +1,63 @@
 import React, {useReducer} from 'react';
 import './App.css';
-import {v1} from 'uuid'
 import {TaskType, Todolist} from "./Todolist";
+import {v1} from 'uuid'
 import {SuperInput} from "./Components/SuperInput";
 import {
-    addTaskAC,
+    addMessageAC,
     AddTodolistTaskAC,
-    ChangeStatusAC,
-    ChangeTitleSpanAC,
-    reducerTasks,
-    removeTaskAC
-} from "./Reducer/ReducerTasks";
-import {AddTodolistAC, filteredTasksAC, reducerTodolist, removeTodolistAC} from "./Reducer/ReducerTodolist";
+    ChangeEnableSpanAC,
+    changeStatusAC,
+    removeTaskAC,
+    TaskReduce
+} from "./Reducer/TaskReduce";
+import {AddTodolistAC, deleteTodolistTypeAC, filteredButtonAC, TodolistReducer} from "./Reducer/TodolistReducer";
 
 
-export type FilterValueType = 'All'|'Active'|'Completed'
+export type FilterValueType = 'all'|'active'|'completed'
 
- export type  TodolistsType = {
+export type TodolistType = {
     id:string;
     title:string;
     filter:FilterValueType
 }
 
-export  type TaskTypeForDispatch = {
+export  type TasksStateType = {
     [key:string]:TaskType[]
 }
 
 
-
 function App() {
 
+    let todolistId1 = v1();
+    let todolistId2 = v1();
 
-    let todolistID1 = v1()
-    let todolistID2 = v1()
-
-    let [todolists, dispatchTodolists] = useReducer(reducerTodolist,[
-        {id: todolistID1, title: 'What to learn', filter: 'All'},
-        {id: todolistID2, title: 'What to buy', filter: 'All'},
+    let [todolists,dispatchTodolist ] = useReducer(TodolistReducer,[
+        {id: todolistId1, title: "What to learn", filter: "all"},
+        {id: todolistId2, title: "What to buy", filter: "all"}
     ])
 
-    let [tasks, dispatchTasks] = useReducer(reducerTasks,{
-        [todolistID1]: [
-            {id: v1(), title: 'HTML&CSS', isDone: true},
-            {id: v1(), title: 'JS', isDone: true},
-            {id: v1(), title: 'ReactJS', isDone: false},
+    let [tasks, dispatchTasks] = useReducer(TaskReduce,{
+        [todolistId1]: [
+            {id: v1(), title: "HTML&CSS", isDone: true},
+            {id: v1(), title: "JS", isDone: true},
+            {id: v1(), title: "ReactJS", isDone: false},
             {id: v1(), title: "Rest API", isDone: false},
             {id: v1(), title: "GraphQL", isDone: false},
-
         ],
-        [todolistID2]: [
-            {id: v1(), title: 'Rest API', isDone: true},
-            {id: v1(), title: 'GraphQL', isDone: false},
+        [todolistId2]: [
+            {id: v1(), title: "Milk", isDone: true},
+            {id: v1(), title: "React Book", isDone: true},
             {id: v1(), title: "ReactJS", isDone: false},
             {id: v1(), title: "Rest API", isDone: false},
             {id: v1(), title: "GraphQL", isDone: false},
         ]
-    })
-    const removeTask = (todolistID:string,taskId:string)=> {
-        // setTasks(tasks.filter((el)=>el.id!==taskId))
-        dispatchTasks( removeTaskAC(todolistID,taskId))
-    }
+    });
 
-    const AddMessage = (todolistID:string,value:string)=> {
-        // let NewTask = {id: v1(), title: value, isDone: true}
-        // setTasks({...tasks,[todolistID]:[NewTask,...tasks[todolistID]]})
 
-        // setTasks([NewTask,...tasks])
-     dispatchTasks(addTaskAC(todolistID,value))
+    const filteredButton = (todolistId: string, filter: FilterValueType) => {
+        // setTodolists(todolists.map((el)=>el.id===todolistId ? {...el, filter:nameButton}: el))
+        dispatchTodolist(filteredButtonAC(todolistId, filter))
     }
 
 
@@ -74,66 +65,75 @@ function App() {
 
 
 
-    const filteredTask =(todolistID:string,nameButton:FilterValueType)=> {
+        const RemoveTask = (todolistId:string,id:string)=> {
+        // setTasks(tasks.filter((el)=>el.id!==id))
+            dispatchTasks(removeTaskAC(todolistId,id))
 
-   // setTodolists(todolists.map((el)=>el.id===todolistID ? {...el, filter:nameButton}: el))
-        dispatchTodolists(filteredTasksAC(todolistID,nameButton))
     }
 
-
-
-    const changeStatus = (todolistID:string,id:string,e:boolean)=> {
-        // // setTasks(tasks.map((el)=>el.id===id ? {...el,isDone: e}: el))
-        // setTasks({...tasks,[todolistID]:tasks[todolistID].map((el)=>el.id===id ? {...el,isDone: e}: el)})
-        dispatchTasks(ChangeStatusAC(todolistID,id,e))
+    const  changeStatus = (todolistId:string,id:string,e:boolean)=> {
+        // setTasks(tasks.map((el)=>el.id===id ? {...el, isDone: e}: el))
+        // setTasks({...tasks,[todolistId]:tasks[todolistId].map((el)=>el.id===id ? {...el,isDone:e}: el)})
+        dispatchTasks(changeStatusAC(todolistId,id,e))
     }
-    const deleteTodolist = (todolistID:string)=> {
-// setTodolists(todolists.filter((el)=>el.id!==todolistID))
-        dispatchTodolists(removeTodolistAC(todolistID))
+
+    const addMessage = (todolistId:string,value:string)=> {
+        // setTasks([newTask,...tasks])
+        // setTasks({...tasks,[todolistId]:[newTask,...tasks[todolistId]]})
+        dispatchTasks(addMessageAC(todolistId,value))
+    }
+
+    const deleteTodolist = (todolistId:string)=> {
+        // setTodolists(todolists.filter((el)=>el.id!==todolistId))
+        dispatchTodolist(deleteTodolistTypeAC(todolistId))
     }
 
     const AddTodolist = (value:string)=> {
-        let todolistID3 = v1()
-       //  let NewTask:TodolistsType={id:todolistID3, title: value, filter: 'All'}
-       // setTodolists([...todolists,NewTask])
-       //  setTasks({...tasks,[todolistID3]:[]})
-        dispatchTodolists( AddTodolistAC(todolistID3,value))
-        dispatchTasks(AddTodolistTaskAC(todolistID3))
+        let todolistId3 = v1();
+      // let newTodo:TodolistType=  {id: todolistId3, title: value, filter: "all"}
+      //   setTodolists([...todolists,newTodo])
+      //   setTasks({...tasks,[todolistId3]:[]})
 
+        dispatchTasks(AddTodolistTaskAC(todolistId3 ))
+        dispatchTodolist(AddTodolistAC(value,todolistId3 ))
     }
 
-    const changeTitleSpan = (todolistID:string,taskId:string,title:string)=> {
-        // setTasks({...tasks,[todolistID]:tasks[todolistID].map((el)=>el.id===taskId ?{...el,title:e} : el)})
-        dispatchTasks(ChangeTitleSpanAC(todolistID,taskId,title))
+    const ChangeEnableSpan = (todolistId:string,id:string,e:string)=> {
+        // setTasks({...tasks,[todolistId]:tasks[todolistId].map((el)=>el.id===id ? {...el,title:e}:el)})
+        dispatchTasks(ChangeEnableSpanAC(todolistId,id,e))
     }
-
     return (
-        <div className="App">
 
-            <SuperInput AddMessage={AddTodolist}/>
+        <div className="App">
+         <div> <SuperInput addMessage={AddTodolist}/></div>
+
+
             {todolists.map((el)=>{
 
-                let filtered =tasks[el.id]
-                if (el.filter==='Active'){filtered=tasks[el.id].filter((el)=>el.isDone===false)}
-                if (el.filter==='Completed'){filtered=tasks[el.id].filter((el)=>el.isDone===true)}
+
+                    let filtered =tasks[el.id]
+                    if(el.filter==='active'){filtered=tasks[el.id].filter((f)=>f.isDone===false)}
+                    if(el.filter==='completed'){filtered=tasks[el.id].filter((f)=>f.isDone===true)}
+
+
                 return (
 
-                    <Todolist
-
-                               key={el.id}
-                               todolistID={el.id}
-                               title ={el.title}
-                               task={filtered}
-                               removeTask={removeTask}
-                               filteredTask={filteredTask}
-                               AddMessage={AddMessage}
-                               changeStatus={changeStatus}
-                               Filter={el.filter}
-                               deleteTodolist={deleteTodolist}
-                               changeTitleSpan={changeTitleSpan}
+                    <Todolist key ={el.id}
+                              todolistId={el.id}
+                              title={el.title}
+                              task={filtered}
+                              filteredButton={filteredButton}
+                              removeTask={RemoveTask}
+                              changeStatus={changeStatus}
+                              addMessage={addMessage}
+                              filter={el.filter}
+                              deleteTodolist={deleteTodolist}
+                              ChangeEnableSpan={ChangeEnableSpan}
                     />
                 )
             })}
+
+
 
         </div>
     );
