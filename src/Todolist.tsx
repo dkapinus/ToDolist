@@ -1,6 +1,5 @@
 import React from 'react';
 import {FilterValueType} from "./App";
-import s from './Todolist.module.css'
 import {SuperInput} from "./Components/SuperInput";
 import {EnableSpan} from "./Components/EnableSpan";
 
@@ -8,17 +7,18 @@ type TodolistType = {
     todolistId: string
     title: string
     task: TaskType[]
-    filteredButton: (todolistId: string, nameButton: FilterValueType) => void
-    removeTask: (todolistId: string, id: string) => void
-    changeStatus: (todolistId: string, id: string, e: boolean) => void
-    addMessage: (todolistId: string, value: string) => void
+    filtered: (todolistId:string,nameButton: FilterValueType) => void
+    removeTask: (todolistId:string,id: string) => void
+    changeStatus: (todolistId:string,id: string, e: boolean) => void
+    addMessage: (todolistId:string,value: string) => void
     filter: FilterValueType
-    deleteTodolist: (todolistId: string) => void
-    ChangeEnableSpan: (todolistId: string, id: string, e: string) => void
+    deleteTodolist:(todolistId:string)=>void
+    changeEnableSpan:(todolistId:string,id: string,e:string)=>void
+    enableTodolistName:(todolistId:string,e:string)=>void
 }
 
 export type TaskType = {
-    id: string;
+    id: string,
     title: string;
     isDone: boolean
 }
@@ -27,66 +27,68 @@ export type TaskType = {
 export const Todolist: React.FC<TodolistType> = ({
                                                      todolistId,
                                                      title, task,
-                                                     filteredButton, removeTask,
+                                                     filtered, removeTask,
                                                      changeStatus, addMessage,
-                                                     filter, deleteTodolist,
-                                                     ChangeEnableSpan,
+                                                     filter,deleteTodolist,
+                                                     changeEnableSpan,enableTodolistName,
                                                      ...props
                                                  }) => {
 
-    const onClickHandlerButton = (nameButton: FilterValueType) => {
-        filteredButton(todolistId, nameButton)
+
+    const onClickHandler = (todolistId:string,nameButton: FilterValueType) => {
+        filtered(todolistId,nameButton)
     }
 
-    const RemoveTask = (id: string) => {
-        removeTask(todolistId, id)
+    const onClickDeleteTask = (id: string) => {
+        removeTask(todolistId,id)
     }
 
-
-    const ChangeStatus = (id: string, e: boolean) => {
-        changeStatus(todolistId, id, e)
+    const onchangeStatus = (id: string, e: boolean) => {
+        changeStatus(todolistId,id, e)
     }
+
 
     const AddMessage = (value: string) => {
-        addMessage(todolistId, value)
+            addMessage(todolistId,value)
     }
 
-    const DeleteTodolist = () => {
+
+
+    const DeleteTodolist = ()=> {
         deleteTodolist(todolistId)
     }
-    return (
-        <div>
-            <h3>{title}
-                <button onClick={DeleteTodolist}>X</button>
-            </h3>
-            <SuperInput addMessage={AddMessage}/>
 
-            <ul>
-                {task.map((el) => {
-                    const changeEnableSpan = (e: string) => {
-                        ChangeEnableSpan(todolistId, el.id, e)
-                    }
-                    return (
-                        <li className={el.isDone ? s.isDone : ''} key={el.id}>
-                            <EnableSpan title={el.title} changeEnableSpan={changeEnableSpan}/>
-                            <input type={"checkbox"} onChange={(e) => ChangeStatus(el.id, e.currentTarget.checked)}
-                                   checked={el.isDone}/>
-                            <button onClick={() => RemoveTask(el.id)}>X</button>
-                        </li>
+    const EnableTodolistName = (e:string)=> {
+        enableTodolistName(todolistId,e)
+    }
 
-                    )
-                })}
-            </ul>
-            <button className={filter === 'all' ? s.activeButton : ''}
-                    onClick={() => onClickHandlerButton('all')}>All
-            </button>
-            <button className={filter === 'active' ? s.activeButton : ''}
-                    onClick={() => onClickHandlerButton('active')}>Active
-            </button>
-            <button className={filter === 'completed' ? s.activeButton : ''}
-                    onClick={() => onClickHandlerButton('completed')}>Completed
-            </button>
-        </div>
-    );
+    return (<div>
+        <h3><EnableSpan title={title} changeEnableSpan={EnableTodolistName}/>
+            <button onClick={DeleteTodolist}>Delete</button>
+        </h3>
+
+          <SuperInput addMessage={AddMessage}/>
+        <ul>
+            {task.map((el) => {
+                const ChangeEnableSpan =(e:string)=> {
+                    changeEnableSpan(todolistId,el.id,e)
+                }
+                return (
+                    <li className={el.isDone ? 'is-done' :''}>
+                        <EnableSpan title={el.title} changeEnableSpan={ChangeEnableSpan}/>
+                        <input type={'checkbox'} checked={el.isDone}
+                               onChange={(e) => onchangeStatus(el.id, e.currentTarget.checked)}/>
+                        <button onClick={() => onClickDeleteTask(el.id)}>X</button>
+                    </li>
+                )
+            })}
+        </ul>
+        <button className={filter === 'All' ? 'active-filter' : ''} onClick={() => onClickHandler(todolistId,'All')}>All</button>
+        <button className={filter === 'Active' ? 'active-filter' : ''} onClick={() => onClickHandler(todolistId,'Active')}>Active
+        </button>
+        <button className={filter === 'Completed' ? 'active-filter' : ''}
+                onClick={() => onClickHandler(todolistId,'Completed')}>Completed
+        </button>
+    </div>);
 };
 
