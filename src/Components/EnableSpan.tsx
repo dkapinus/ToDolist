@@ -1,28 +1,37 @@
 import React, {ChangeEvent, useState} from 'react';
 
 type EnableSpanType = {
-    title:string
-    changeEnableSpan:(e:string)=>void
+    title: string
+    changeInputTitle: (newTitle:string) => void
 }
 
 
-export const EnableSpan:React.FC <EnableSpanType>= ({title,changeEnableSpan,...props}) => {
+export const EnableSpan: React.FC<EnableSpanType> = ({
+                                                         title,
+                                                         changeInputTitle,
+                                                         ...props
+                                                     }) => {
 
 
-    const [editMode,SetEditMode]=useState(false)
+    const [editMode, setEditMode] = useState(false)
 
-    const Change =()=> {
-      SetEditMode(!editMode)
+
+    const ChangeEditMode = () => {
+        setEditMode(!editMode)
     }
 
-   const  onEnableSpan =(e:ChangeEvent<HTMLInputElement>)=> {
-        changeEnableSpan(e.currentTarget.value)
-   }
+    const onChangeInputTitle = (e: ChangeEvent<HTMLInputElement>) => {
+        changeInputTitle(e.currentTarget.value)
+
+
+    }
+
 
     return (
-        <>{editMode
-            ? <input value={title} onBlur={Change} onChange={onEnableSpan} autoFocus/>
-            :<span onDoubleClick={Change}>{title}</span>}
+        <> {editMode
+            ? <input value={title} onChange={onChangeInputTitle} onBlur={ChangeEditMode} autoFocus />
+
+            : <span onDoubleClick={ChangeEditMode}>{title}</span>}
 
         </>
     );

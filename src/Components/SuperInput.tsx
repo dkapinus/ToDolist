@@ -1,38 +1,52 @@
 import React, {ChangeEvent, KeyboardEvent, useState} from 'react';
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
 
-
-type  SuperInputType ={
-    addMessage:(value:string)=>void
+type SuperButtonType ={
+    addMessage:(valueInput:string)=>void
 }
 
-export const SuperInput:React.FC<SuperInputType> = ({addMessage,...props}) => {
 
-    const [value, SetValue] = useState('')
+
+export const SuperInput:React.FC<SuperButtonType> = ({addMessage,...props}) => {
+
+    const [valueInput, setInputValue] = useState('')
+    const [error, setError] = useState('')
 
     const onChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
-        SetValue(e.currentTarget.value)
-    }
+        setInputValue(e.currentTarget.value)
 
-    const [error, SetError] = useState<string | null>()
+    }
 
     const AddMessage = () => {
-        if (value.trim() !== '') {
-            addMessage(value.trim())
-        } else (SetError('Title is requiet'))
-        SetValue('')
-    }
+        if (valueInput.trim() !== '') {
+            addMessage(valueInput)
+        } else {
+            setError('Title is requiet')
+        }
+        setInputValue('')
 
+
+    }
     const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
             AddMessage()
-        } else (SetError(''))
+        }
+        setError('')
     }
     return (
-        <>
-            <input value={value} className={error ? 'error' : ''} onChange={onChangeInput} onKeyDown={onKeyDown}/>
-            <button onClick={AddMessage}>Add</button>
-            {error && <div className='error-message'>{error}</div>}
-        </>
+        <div>
+
+            <TextField
+                size='small'
+                value={valueInput}
+                onChange={onChangeInput}
+                onKeyDown={onKeyDown}
+                error={!!error}
+                id="outlined-basic" label={error? 'Error':'SomeWrite'} variant= 'outlined' />
+            <Button  size='small' style={{maxWidth: '40px', maxHeight: '40px', minWidth: '40px', minHeight: '40px'}} onClick={AddMessage} variant="contained">+</Button>
+
+        </div>
     );
 };
 
