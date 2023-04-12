@@ -11,8 +11,8 @@ import {
 } from "./store/tasks-reducer";
 import {
     ADDTodolistAC,
-    ChangeTodolistTitleAC,
-    FilterTypeAC,
+    ChangeTodolistTitleAC, filterTypeAC,
+
     RemoveTodolistAC,
     todolistsReducer
 } from "./store/todolists-reducer";
@@ -46,7 +46,7 @@ const todolists =useSelector<AppRootStateType,TodolistType[]>(state => state.tod
 
 
     const ButtonFilter = (todolistId: string,nameButton: FilterValuesType) => {
-        dispatch(FilterTypeAC(todolistId,nameButton))
+        dispatch(filterTypeAC(todolistId,nameButton))
     }
 
     const RemoveTask = (todolistId: string, taskID: string) => {

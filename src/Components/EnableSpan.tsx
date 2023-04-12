@@ -1,4 +1,4 @@
-import React, {ChangeEvent, useState} from 'react';
+import React, {ChangeEvent, memo, useState} from 'react';
 
 type EnableSpanType = {
     title: string
@@ -6,7 +6,7 @@ type EnableSpanType = {
 }
 
 
-export const EnableSpan: React.FC<EnableSpanType> = ({
+export const EnableSpan: React.FC<EnableSpanType> =memo( ({
                                                          title,
                                                          changeInputTitle,
                                                          ...props
@@ -35,5 +35,5 @@ export const EnableSpan: React.FC<EnableSpanType> = ({
 
         </>
     );
-};
+})
 

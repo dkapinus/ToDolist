@@ -1,19 +1,19 @@
-import React from 'react';
+import React, {memo, useCallback} from 'react';
 import {FilterValuesType} from "./App";
 import {SuperInput} from "./Components/SuperInput";
 import {EnableSpan} from "./Components/EnableSpan";
 import { TodolistType} from "./AppWithRedux";
 import {useDispatch, useSelector} from "react-redux";
 import {AppRootStateType} from "./store/store";
-import {addTaskTypeAC, ChangeCheckedInputTypeAC, ChangeInputTitleAC, removeTaskAC} from "./store/tasks-reducer";
-import {ChangeTodolistTitleAC, FilterTypeAC, RemoveTodolistAC} from "./store/todolists-reducer";
+import {addTaskTypeAC} from "./store/tasks-reducer";
+import {ChangeTodolistTitleAC, filterTypeAC,  RemoveTodolistAC} from "./store/todolists-reducer";
 
 import {TaskType} from "./Todolist";
 import Button from "@mui/material/Button";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
-import Checkbox from "@mui/material/Checkbox";
+import {Task} from "./Task";
 
 
 type PropsType = {
@@ -24,39 +24,43 @@ type PropsType = {
 
 
 
-export const TodolistWithRedux = ({todolist}:PropsType) => {
+export const TodolistWithRedux = memo(({todolist}:PropsType) => {
+
 
     const {id,title,filter} =todolist
 
     const tasks =useSelector<AppRootStateType,Array<TaskType>>(state => state.tasks[id])
 
+    let filtered = tasks
+    if (filter === 'active') {
+        filtered = tasks.filter((el) => el.isDone === false)
+    }
+    if (filter === 'completed') {
+        filtered = tasks.filter((el) => el.isDone === true)
+    }
+
     const dispatch =useDispatch()
 
 
-    const onClickHandlerButtonFilter = (nameButton: FilterValuesType) => {
-        dispatch(FilterTypeAC(id, nameButton))
-    }
+    const onClickHandlerButtonFilter = useCallback( (nameButton: FilterValuesType) => {
 
-    const RemoveTask = (taskID: string) => {
-        dispatch(removeTaskAC(id, taskID))
-    }
+        dispatch(filterTypeAC(id, nameButton))
+    },[dispatch,id])
 
-    const onChangeCheckedInput = (taskId: string, status: boolean) => {
-        dispatch(ChangeCheckedInputTypeAC(id, taskId, status))
-    }
 
-    const AddMessage = (valueInput: string) => {
+
+    const AddMessage =useCallback( (valueInput: string) => {
         dispatch(addTaskTypeAC(id, valueInput))
-    }
+    },[dispatch])
 
-    const ChangeTodolistTitle = (newTitle: string) => {
+    const ChangeTodolistTitle = useCallback((newTitle: string) => {
         dispatch(ChangeTodolistTitleAC(id, newTitle))
 
-    }
+    },[dispatch,id])
 
-    const DeleteTodolist = () => {
+    const DeleteTodolist =useCallback( () => {
         dispatch(RemoveTodolistAC(id))
-    }
+    },[dispatch])
     return (
         <div>
             <h3><EnableSpan title={title} changeInputTitle={ChangeTodolistTitle}/>
@@ -68,21 +72,10 @@ export const TodolistWithRedux = ({todolist}:PropsType) => {
 
             <SuperInput addMessage={AddMessage}/>
             <ul>
-                {tasks.map((el) => {
-                    const ChangeInputTitle = (newTitle: string) => {
-                        dispatch(ChangeInputTitleAC(id, el.id, newTitle))
+                {filtered.map((el) => {
 
-                    }
                     return (
-                        <li key={el.id} className={el.isDone ? 'is-done' : ''}>
-                            <EnableSpan title={el.title} changeInputTitle={ChangeInputTitle}/>
-
-                            <Checkbox onChange={(e) => onChangeCheckedInput(el.id, e.currentTarget.checked)} checked={el.isDone} defaultChecked style={{alignItems:'flex-end'}} />
-                            <IconButton style={{maxWidth: '100px', maxHeight: '30px', minWidth: '100px', minHeight: '30px',alignItems:'flex-end'}} onClick={() => RemoveTask(el.id)} aria-label="delete">
-                                <DeleteIcon />
-                            </IconButton>
-                        </li>
-
+                        <Task key={el.id} taskId={el.id} isDone={el.isDone} title={el.title} todolistID ={id}  />
                     )
                 })}
             </ul>
@@ -95,7 +88,7 @@ export const TodolistWithRedux = ({todolist}:PropsType) => {
 
         </div>
     );
-};
+})
 
 
 

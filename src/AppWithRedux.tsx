@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useCallback} from 'react';
 import './App.css';
 import {v1} from 'uuid';
 import {SuperInput} from "./Components/SuperInput";
@@ -38,14 +38,14 @@ export function AppWithRedux() {
     const dispatch = useDispatch()
 
 
-    const AddTodolist = (valueInput: string) => {
+    const AddTodolist = useCallback( (valueInput: string) => {
         let todolistId3 = v1();
         let newTitle: TodolistType = {id: todolistId3, title: valueInput, filter: 'all'}
 
         dispatch(ADDTodolistAC(newTitle))
         dispatch(ADDTodolistTaskAC(todolistId3))
 
-    }
+    },[dispatch])
 
 
     return (
@@ -64,6 +64,7 @@ export function AppWithRedux() {
                             <Paper style={{padding:'5px'}}>
                                 <TodolistWithRedux
                                     todolist={el}
+                                    key={el.id}
                                 />
                             </Paper>
 
