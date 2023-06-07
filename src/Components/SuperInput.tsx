@@ -1,54 +1,65 @@
-import React, {ChangeEvent, KeyboardEvent, memo, useState} from 'react';
-import TextField from "@mui/material/TextField";
+import React, {ChangeEvent, KeyboardEvent, useState} from 'react';
+import s from "../Todolist.module.css";
 import Button from "@mui/material/Button";
+import TextField from '@mui/material/TextField';
 
-type SuperButtonType = {
-    addMessage: (valueInput: string) => void
+
+type SuperInputType = {
+    addTask: (inputValue: string) => void
 }
 
 
-export const SuperInput:React.FC<SuperButtonType> = memo(({addMessage,...props}) => {
+export const SuperInput: React.FC<SuperInputType> = ({addTask, ...props}) => {
 
+    let [inputValue, setInputValue] = useState('')
 
-    const [valueInput, setInputValue] = useState('')
-    const [error, setError] = useState('')
+    let [error, setError] = useState<null | string>('')
 
     const onChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.currentTarget.value)
-
     }
 
-    const AddMessage = () => {
-        if (valueInput.trim() !== '') {
-            addMessage(valueInput)
-        } else {
-            setError('Title is requiet')
-        }
+    const addTaskHandler = () => {
+        if (inputValue.trim() !== '') {
+            addTask(inputValue.trim())
+        } else (setError('Title is required'))
         setInputValue('')
-
-
     }
-    const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-        if(error==='') { setError('')}
-        if (e.key === 'Enter') {
-            AddMessage()
-        }
 
+
+    const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            addTaskHandler()
+        }
+        setError('')
+    }
+
+    const ButtonStyle = {
+        maxWidth: '38px',
+        maxHeight: '38px',
+        minWidth: '38px',
+        minHeight: '38px'
     }
     return (
-        <div>
+        <span>
 
-            <TextField
-                size='small'
-                value={valueInput}
-                onChange={onChangeInput}
-                onKeyDown={onKeyDown}
-                error={!!error}
-                id="outlined-basic" label={error ? 'Error' : 'SomeWrite'} variant='outlined'/>
-            <Button size='small' style={{maxWidth: '40px', maxHeight: '40px', minWidth: '40px', minHeight: '40px'}}
-                    onClick={AddMessage} variant="contained">+</Button>
+              <TextField
+                  // className={error ? s.error : ''} onChange={onChangeInput} onKeyPress={onKeyPress}
+                  error={!!error}
+                  value={inputValue}
+                  size='small'
+                  id="outlined-textarea"
+                  label={error ? error:"Write Text"}
+                  placeholder="Write Text"
 
-        </div>
+                  onChange={onChangeInput}
+                  onKeyDown={onKeyDown}
+              />
+            <Button variant="contained"
+                    style={ButtonStyle}
+                    onClick={addTaskHandler}>+</Button>
+
+        </span>
     );
-})
+};
 
