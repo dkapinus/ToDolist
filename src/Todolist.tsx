@@ -76,7 +76,7 @@ export const Todolist: React.FC<TodolistType> = ({
             </h3>
 
             <div>
-                <SuperInput addTask={addTaskCallback}/>
+                <SuperInput add={addTaskCallback}/>
             </div>
 
             <ul>{task.map((el) => {

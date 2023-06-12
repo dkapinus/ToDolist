@@ -1,15 +1,14 @@
 import React, {ChangeEvent, KeyboardEvent, useState} from 'react';
-import s from "../Todolist.module.css";
 import Button from "@mui/material/Button";
 import TextField from '@mui/material/TextField';
 
 
 type SuperInputType = {
-    addTask: (inputValue: string) => void
+    add: (inputValue: string) => void
 }
 
 
-export const SuperInput: React.FC<SuperInputType> = ({addTask, ...props}) => {
+export const SuperInput: React.FC<SuperInputType> = ({add, ...props}) => {
 
     let [inputValue, setInputValue] = useState('')
 
@@ -21,7 +20,7 @@ export const SuperInput: React.FC<SuperInputType> = ({addTask, ...props}) => {
 
     const addTaskHandler = () => {
         if (inputValue.trim() !== '') {
-            addTask(inputValue.trim())
+            add(inputValue.trim())
         } else (setError('Title is required'))
         setInputValue('')
     }
