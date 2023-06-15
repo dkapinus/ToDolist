@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React, {memo, useCallback} from 'react';
 import Checkbox from "@mui/material/Checkbox";
 import s from "./Todolist.module.css"
 import {EditableSpan} from "./Components/EditableSpan";
@@ -14,15 +14,16 @@ type TasksType = {
 
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
-export  const Task = ({task,removeTask,changeStatus,callbackChangeInputTask}:TasksType) => {
+export  const Task =memo( ({task,removeTask,changeStatus,callbackChangeInputTask}:TasksType) => {
+    console.log('task')
 
-    const onClickHandlerRemoveTask =useCallback( (taskId: string) => {
-        removeTask( taskId)
-    },[removeTask])
+    const onClickHandlerRemoveTask =useCallback( () => {
+        removeTask( task.id)
+    },[removeTask,task.id])
 
     const changeInputTask =useCallback( ( e: string) => {
         callbackChangeInputTask( task.id, e)
-    },[callbackChangeInputTask])
+    },[callbackChangeInputTask,task.id])
 
     const onChangeStatus =useCallback( (id: string, e: boolean) => {
         changeStatus( id, e)
@@ -38,8 +39,8 @@ export  const Task = ({task,removeTask,changeStatus,callbackChangeInputTask}:Tas
 
             <EditableSpan title={task.title} changeEditableSpan={changeInputTask}/>
 
-            <button onClick={() => onClickHandlerRemoveTask(task.id)}>X</button>
+            <button onClick={onClickHandlerRemoveTask}>X</button>
         </div>
     );
-};
+})
 

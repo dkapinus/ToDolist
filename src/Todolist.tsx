@@ -4,7 +4,7 @@ import {SuperInput} from "./Components/SuperInput";
 import {EditableSpan} from "./Components/EditableSpan";
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
-import Button from '@mui/material/Button';
+import Button, {ButtonProps} from '@mui/material/Button';
 import {Task} from "./Task";
 
 
@@ -42,7 +42,7 @@ export const Todolist: React.FC<TodolistType> =memo( ({
                                                      ...props
                                                  }) => {
 
-    console.log('Todolist')
+
 
 
 
@@ -132,4 +132,5 @@ export const Todolist: React.FC<TodolistType> =memo( ({
     )
         ;
 })
+
 
