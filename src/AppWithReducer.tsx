@@ -121,7 +121,7 @@ function AppWithReducer() {
                                     key={el.id}
                                     todolistID={el.id}
                                     title={el.title}
-                                    task={filtered}
+                                    task={task[el.id]}
                                     removeTask={removeTask}
                                     filterTasks={filterTasks}
                                     addTask={addTask}

@@ -1,4 +1,4 @@
-import React, {ChangeEvent, KeyboardEvent, useState} from 'react';
+import React, {ChangeEvent, KeyboardEvent, memo, useState} from 'react';
 import Button from "@mui/material/Button";
 import TextField from '@mui/material/TextField';
 
@@ -8,7 +8,8 @@ type SuperInputType = {
 }
 
 
-export const SuperInput: React.FC<SuperInputType> = ({add, ...props}) => {
+export const SuperInput: React.FC<SuperInputType> =memo( ({add, ...props}) => {
+
 
     let [inputValue, setInputValue] = useState('')
 
@@ -30,7 +31,8 @@ export const SuperInput: React.FC<SuperInputType> = ({add, ...props}) => {
         if (e.key === 'Enter') {
             addTaskHandler()
         }
-        setError('')
+        if (error){ setError('')}
+
     }
 
     const ButtonStyle = {
@@ -60,5 +62,5 @@ export const SuperInput: React.FC<SuperInputType> = ({add, ...props}) => {
 
         </span>
     );
-};
+})
 

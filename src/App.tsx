@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import './App.css';
 import {TaskType, Todolist} from "./Todolist";
 import {v1} from "uuid";
@@ -54,7 +54,7 @@ function App() {
         setTodolists(todolists.map((el)=>el.id ===todolistID ? {...el,filter:filterValue} : el))
     }
 
-    const addTask = (todolistID:string,inputValue: string) => {
+    const addTask =(todolistID:string,inputValue: string) => {
         let newTask:TaskType = {id: v1(), title: inputValue, isDone: true}
         setTask({ ...task,[todolistID]:[newTask,...task[todolistID]]})
     }
@@ -106,7 +106,7 @@ function App() {
                                     key={el.id}
                                     todolistID={el.id}
                                     title={el.title}
-                                    task={filtered}
+                                    task={task[el.id]}
                                     removeTask={removeTask}
                                     filterTasks={filterTasks}
                                     addTask={addTask}

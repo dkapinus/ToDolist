@@ -1,12 +1,13 @@
-import React from 'react';
-import s from "./Todolist.module.css";
+import React, {memo, useCallback} from 'react';
 import {FilterValueType} from "./App";
 import {SuperInput} from "./Components/SuperInput";
 import {EditableSpan} from "./Components/EditableSpan";
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
+import {Task} from "./Task";
+
+
 
 type TodolistType = {
     todolistID: string
@@ -22,7 +23,7 @@ type TodolistType = {
     callbackChangeTodolistName: (todolistID: string, e: string) => void
 }
 
-const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
+
 
 export type TaskType = {
     id: string
@@ -31,7 +32,7 @@ export type TaskType = {
 }
 
 
-export const Todolist: React.FC<TodolistType> = ({
+export const Todolist: React.FC<TodolistType> =memo( ({
                                                      todolistID, title,
                                                      task, removeTask,
                                                      filterTasks, addTask,
@@ -41,31 +42,48 @@ export const Todolist: React.FC<TodolistType> = ({
                                                      ...props
                                                  }) => {
 
-    const onClickHandlerFilter = (taskId: string) => {
-        removeTask(todolistID, taskId)
-    }
+    console.log('Todolist')
 
-    const filteredTask = (nameFilterButton: FilterValueType) => {
+
+
+    const filteredTask =useCallback( (nameFilterButton: FilterValueType) => {
         filterTasks(todolistID, nameFilterButton)
-    }
+    },[filterTasks,todolistID])
 
-    const addTaskCallback = (inputValue: string) => {
+    const addTaskCallback = useCallback((inputValue: string) => {
         addTask(todolistID, inputValue)
-    }
+    },[addTask,todolistID])
 
 
-    const deleteTodolist = () => {
+    const deleteTodolist = useCallback(() => {
         removeTodolist(todolistID)
-    }
+    },[removeTask,todolistID])
 
-    const changeInputTask = (id: string, e: string) => {
+    const onClickHandlerRemoveTask =useCallback( (taskId: string) => {
+        removeTask(todolistID, taskId)
+    },[removeTask,todolistID])
+
+    const changeInputTask =useCallback( (id: string, e: string) => {
         callbackChangeInputTask(todolistID, id, e)
-    }
+    },[callbackChangeInputTask,todolistID])
 
-    const changeTodolistName = (e: string) => {
+    const onChangeStatus =useCallback( (id: string, e: boolean) => {
+        changeStatus(todolistID, id, e)
+    },[changeStatus,todolistID])
+
+    const changeTodolistName =useCallback( (e: string) => {
         callbackChangeTodolistName(todolistID, e)
-    }
+    },[callbackChangeTodolistName,todolistID])
 
+
+
+    let filtered = task
+    if (filter === 'active') {
+        filtered = task.filter((el) => el.isDone === false)
+    }
+    if (filter === 'completed') {
+        filtered = task.filter((el) => el.isDone === true)
+    }
 
     return (
         <div>
@@ -79,22 +97,15 @@ export const Todolist: React.FC<TodolistType> = ({
                 <SuperInput add={addTaskCallback}/>
             </div>
 
-            <ul>{task.map((el) => {
-                const onChangeStatus = (id: string, e: boolean) => {
-                    changeStatus(todolistID, id, e)
-                }
+            <ul>{filtered.map((el) => {
+
 
                 return <li key={el.id}>
-                    <Checkbox {...label}
-                              checked={el.isDone}
-                              onChange={(e) => onChangeStatus(el.id, e.currentTarget.checked)}
-                              className={el.isDone === true ? s.isDone : ''}
-                    />
-
-
-                    <EditableSpan title={el.title} changeEditableSpan={(e) => changeInputTask(el.id, e)}/>
-
-                    <button onClick={() => onClickHandlerFilter(el.id)}>X</button>
+               <Task
+                   task={el}
+                   removeTask={onClickHandlerRemoveTask}
+                   changeStatus={onChangeStatus}
+                   callbackChangeInputTask={changeInputTask}/>
 
                 </li>
             })}
@@ -120,5 +131,5 @@ export const Todolist: React.FC<TodolistType> = ({
         </div>
     )
         ;
-};
+})
 
