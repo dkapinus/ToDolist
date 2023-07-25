@@ -1,4 +1,5 @@
-import axios from 'axios'
+import axios, { AxiosResponse } from 'axios'
+import {FilterValueType} from "../AppWithRedux";
 
 
 
@@ -9,53 +10,43 @@ import axios from 'axios'
      }
  )
 
-export const todolistAPI = {
 
+
+
+
+export const todolistAPI = {
     getTodolist() {
-        const promise = instance.get<TodolistType[]>(
-            `todo-lists`)
-        return promise
+        return instance.get<TodolistType[]>('todo-lists');
     },
     createTodolist(title: string) {
-        const promise = instance.post<ResponseTodolistType<{item:TodolistType}>>(
-            `todo-lists`, {title: title}
-        )
-        return promise
+        return instance.post<ResponseType<{ item: TodolistType }>, AxiosResponse<ResponseType<{ item: TodolistType }>>, { title: string }>('todo-lists', {title});
     },
-
-
-    deleteTodolist(todolistId: string) {
-        const promise = instance.delete<ResponseTodolistType>(
-            `todo-lists/${todolistId}`,
-
-
-        )
-        return promise
+    deleteTodolist(id: string) {
+        return instance.delete<ResponseType>(`todo-lists/${id}`);
     },
-    updateTodolist(todolistId: string, title: string) {
-        const promise = instance.put<ResponseTodolistType>(
-            `todo-lists/${todolistId}`,
-            {title: title},
-        )
-        return promise
+    updateTodolist(id: string, title: string) {
+        return instance.put<ResponseType, AxiosResponse<ResponseType>, { title: string }>(`todo-lists/${id}`, {title});
     },
-
 
 }
 
-type TodolistType = {
-    id: string
-    addedDate: Date
-    order: number
-    title: string
+// types
 
-}
-
-type ResponseTodolistType<T={}> = {
-
+export type ResponseType<D = {}> = {
     resultCode: number
-    messages: [],
-        data: T
+    messages: Array<string>
+    fieldsErrors: Array<string>
+    data: D
+}
+
+export type TodolistType = {
+    id: string,
+    title: string,
+    filter: FilterValueType
+    addedDate: string
+    order: number
 
 }
+
+
 

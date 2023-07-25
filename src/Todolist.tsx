@@ -1,11 +1,14 @@
-import React, {memo, useCallback} from 'react';
-import {FilterValueType} from "./App";
+import React, {memo, useCallback, useEffect} from 'react';
+import {FilterValueType} from "./AppWithRedux";
 import {SuperInput} from "./Components/SuperInput";
 import {EditableSpan} from "./Components/EditableSpan";
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
-import Button, {ButtonProps} from '@mui/material/Button';
+import Button from '@mui/material/Button';
 import {Task} from "./Task";
+import {TaskStatuses, TaskType} from "./api/task-api";
+import {ThunkTaskGetTC} from "./state/taskReducer";
+import { useAppDispatch} from "./state/store";
 
 
 
@@ -16,7 +19,7 @@ type TodolistType = {
     removeTask: (todolistID: string, taskId: string) => void
     filterTasks: (todolistID: string, nameFilterButton: FilterValueType) => void
     addTask: (todolistID: string, inputValue: string) => void
-    changeStatus: (todolistID: string, taskId: string, e: boolean) => void
+    changeStatus: (todolistID: string, taskId: string, status: TaskStatuses) => void
     filter: FilterValueType
     removeTodolist: (todolistID: string) => void
     callbackChangeInputTask: (todolistID: string, id: string, e: string) => void
@@ -25,11 +28,6 @@ type TodolistType = {
 
 
 
-export type TaskType = {
-    id: string
-    title: string
-    isDone: boolean
-}
 
 
 export const Todolist: React.FC<TodolistType> =memo( ({
@@ -44,7 +42,12 @@ export const Todolist: React.FC<TodolistType> =memo( ({
 
 
 
+    const dispatch = useAppDispatch()
 
+    useEffect(()=>{
+
+        dispatch(ThunkTaskGetTC(todolistID))
+    },[])
 
     const filteredTask =useCallback( (nameFilterButton: FilterValueType) => {
         filterTasks(todolistID, nameFilterButton)
@@ -67,8 +70,8 @@ export const Todolist: React.FC<TodolistType> =memo( ({
         callbackChangeInputTask(todolistID, id, e)
     },[callbackChangeInputTask,todolistID])
 
-    const onChangeStatus =useCallback( (id: string, e: boolean) => {
-        changeStatus(todolistID, id, e)
+    const onChangeStatus =useCallback( (id: string, status: TaskStatuses) => {
+        changeStatus(todolistID, id, status)
     },[changeStatus,todolistID])
 
     const changeTodolistName =useCallback( (e: string) => {
@@ -79,10 +82,10 @@ export const Todolist: React.FC<TodolistType> =memo( ({
 
     let filtered = task
     if (filter === 'active') {
-        filtered = task.filter((el) => el.isDone === false)
+        filtered = task.filter((el) => el.status ===TaskStatuses.New)
     }
     if (filter === 'completed') {
-        filtered = task.filter((el) => el.isDone === true)
+        filtered = task.filter((el) => el.status === TaskStatuses.Completed)
     }
 
     return (

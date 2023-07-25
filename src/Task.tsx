@@ -2,20 +2,20 @@ import React, {memo, useCallback} from 'react';
 import Checkbox from "@mui/material/Checkbox";
 import s from "./Todolist.module.css"
 import {EditableSpan} from "./Components/EditableSpan";
-import {TaskType} from "./Todolist";
+import {TaskStatuses, TaskType} from "./api/task-api";
 
 
 type TasksType = {
     task:TaskType
     removeTask: ( taskId: string) => void
-    changeStatus: (taskId: string, e: boolean) => void
+    changeStatus: (taskId: string, status: TaskStatuses) => void
     callbackChangeInputTask: ( id: string, e: string) => void
 }
 
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
 export  const Task =memo( ({task,removeTask,changeStatus,callbackChangeInputTask}:TasksType) => {
-    console.log('task')
+
 
     const onClickHandlerRemoveTask =useCallback( () => {
         removeTask( task.id)
@@ -25,15 +25,16 @@ export  const Task =memo( ({task,removeTask,changeStatus,callbackChangeInputTask
         callbackChangeInputTask( task.id, e)
     },[callbackChangeInputTask,task.id])
 
-    const onChangeStatus =useCallback( (id: string, e: boolean) => {
-        changeStatus( id, e)
+    const onChangeStatus =useCallback( (id: string, e:boolean) => {
+        const NewValueChecked = e
+        changeStatus( id, NewValueChecked ? TaskStatuses.Completed : TaskStatuses.New)
     },[changeStatus])
     return (
         <div>
             <Checkbox {...label}
-                      checked={task.isDone}
+                      checked={task.status === TaskStatuses.Completed}
                       onChange={(e) => onChangeStatus(task.id, e.currentTarget.checked)}
-                      className={task.isDone === true ? s.isDone : ''}
+                      className={task.status === TaskStatuses.Completed ? s.isDone : ''}
             />
 
 

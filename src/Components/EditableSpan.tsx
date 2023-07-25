@@ -10,7 +10,7 @@ export const EditableSpan: React.FC<EditableSpanType> =memo( ({
                                                              ...props
                                                          }) => {
 
-console.log('Editabal span')
+
     const [editMode, setEditMode] = useState(false)
 
     const ChangeEditMode = () => {

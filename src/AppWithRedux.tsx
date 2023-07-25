@@ -1,34 +1,30 @@
-import React, {useCallback} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import './App.css';
-import {TaskType, Todolist} from "./Todolist";
+import { Todolist} from "./Todolist";
 import {SuperInput} from "./Components/SuperInput";
 import {ButtonAppBar} from "./Components/ButtonAppBar";
 import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 import {
-    addTaskAC,
-    changeInputTaskAC,
-    changeStatusTaskAC,
-    removeTaskAC,
+    ThunkCreateTaskTC,
+    ThunkDeleteTaskTC, ThunkTaskUpdateTC,
 } from "./state/taskReducer";
 import {
-    addTodolistAC,
-    changeTodolistNameAC,
+
     filterTasksTodoAC,
-    removeTodolistAC,
+    ThunkCreateTodoTC, ThunkDeleteTodoTC, ThunkGetStateTC, ThunkUpdateTodoTC,
 } from "./state/todoReducer";
-import {useDispatch, useSelector} from "react-redux";
-import {AppRootStateType} from "./state/store";
-import {TodolistWithRedux} from "./TodolistWithRedux";
+import { useSelector} from "react-redux";
+import { AppRootStateType, useAppDispatch} from "./state/store";
+import {TaskStatuses, TaskType} from "./api/task-api";
+import {TodolistType} from "./api/todolist-api";
+
+
 
 export type FilterValueType = 'all' | 'active' | 'completed'
 
-export type TodolistType = {
-    id: string,
-    title: string,
-    filter: FilterValueType
-}
+
 
 export type TaskKeyType = {
     [key: string]: TaskType[]
@@ -41,42 +37,47 @@ function AppWithReducer() {
 
     let task = useSelector<AppRootStateType, TaskKeyType>(state => state.tasks)
 
+    const dispatch = useAppDispatch()
 
-    const dispatch = useDispatch()
+    useEffect(()=>{
+        dispatch(ThunkGetStateTC())
+    },[])
 
-    const removeTask =useCallback( (todolistID: string, taskId: string) => {
-        dispatch(removeTaskAC(todolistID, taskId))
-    },[dispatch])
+
+
+    const removeTask = useCallback( (todolistID: string, taskId: string) => {
+        dispatch(ThunkDeleteTaskTC(todolistID, taskId))
+    },[])
 
     const filterTasks = useCallback((todolistID: string, filterValue: FilterValueType) => {
         dispatch(filterTasksTodoAC(todolistID, filterValue))
     },[dispatch])
 
     const addTask =useCallback( (todolistID: string, inputValue: string) => {
-        dispatch(addTaskAC(todolistID, inputValue))
-    },[dispatch])
+        dispatch(ThunkCreateTaskTC(todolistID, inputValue))
+    },[])
 
-    const changeStatus =useCallback( (todolistID: string, taskId: string, e: boolean) => {
-        dispatch(changeStatusTaskAC(todolistID, taskId, e))
-    },[dispatch])
+    const changeStatus =useCallback( (todolistID: string, taskId: string, status:TaskStatuses) => {
+        dispatch(ThunkTaskUpdateTC(todolistID, taskId, {status}))
+    },[])
 
     const removeTodolist =useCallback( (todolistID: string) => {
-        dispatch(removeTodolistAC(todolistID))
-        dispatch(removeTodolistAC(todolistID))
-    },[dispatch])
+        dispatch(ThunkDeleteTodoTC(todolistID))
+        dispatch(ThunkDeleteTodoTC(todolistID))
+    },[])
 
     const addTodolist = useCallback((inputValue: string) => {
-        let action = addTodolistAC(inputValue)
+        let action = ThunkCreateTodoTC(inputValue)
         dispatch(action)
 
-    },[dispatch])
+    },[])
 
-    const changeInputTask = useCallback((todolistID: string, id: string, e: string) => {
-        dispatch(changeInputTaskAC(todolistID, id, e))
-    },[dispatch])
+    const changeInputTask = useCallback((todolistID: string, id: string, title:string) => {
+        dispatch(ThunkTaskUpdateTC(todolistID, id, {title}))
+    },[])
 
     const changeTodolistName =useCallback( (todolistID: string, e: string) => {
-        dispatch(changeTodolistNameAC(todolistID, e))
+        dispatch(ThunkUpdateTodoTC(todolistID, e))
     },[])
 
     return (
