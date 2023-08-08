@@ -1,8 +1,10 @@
 import {TaskKeyType} from "../AppWithRedux";
-import {addTodolistType, removeTodolistType, setTodolistType} from "./todoReducer";
+import {addTodolistType, removeTodolistType, setDisableAC, setTodolistType} from "./todoReducer";
 import {Dispatch} from "redux";
 import {taskAPI, TaskPriorities, TaskStatuses, TaskType, UpdateTaskModelType} from "../api/task-api";
 import {AppRootStateType} from "./store"
+import {RequestStatusType, setLoadingAC} from "./app-reducer";
+import {handleServerAppError, handleServerNetworkError} from "../utils/error-utils";
 
 
 const initialState: TaskKeyType = {}
@@ -31,9 +33,24 @@ export const taskReducer = (state = initialState, action: TsarType): TaskKeyType
 
             return {
                 ...state,
-                [action.payload.task.todoListId]: [action.payload.task, ...state[action.payload.task.todoListId]]
+                [action.payload.task.todoListId]: 
+                    [{id:action.payload.task.id,
+                        title:action.payload.task.title,
+                        status:TaskStatuses.New,
+                        priority:TaskPriorities.Hi,
+                        startDate:'',
+                        description:'',
+                        deadline:'',
+                        todoListId:action.payload.task.todoListId,
+                        order:1,
+                        addedDate:'',
+                        taskDisable:'idle'
+                        
+                    }, ...state[action.payload.task.todoListId]]
             }
         }
+
+           
 
 
         case 'CHANGE-UPDATE-TASK': {
@@ -42,7 +59,7 @@ export const taskReducer = (state = initialState, action: TsarType): TaskKeyType
                 ...state,
                 [action.payload.todolistID]: state[action.payload.todolistID].map((el) => el.id === action.payload.id ? {
                     ...el,
-                     ...action.payload.model
+                    ...action.payload.model
                 } : el)
             }
         }
@@ -59,6 +76,14 @@ export const taskReducer = (state = initialState, action: TsarType): TaskKeyType
                 [action.payload.todolistID]: state[action.payload.todolistID].filter((el) => el.id !== action.payload.todolistID)
             }
         }
+        case 'SET-DISABLE-TASK': {
+
+
+            return {
+                ...state,
+             [action.payload.todolistID]:state[action.payload.todolistID].map((el)=>el.id===action.payload.taskId ? {...el,taskDisable:action.payload.taskDisable} :el)
+            }
+        }
         default:
             return state
     }
@@ -69,6 +94,7 @@ export type TsarType =
     | addTaskACType | changeInputTaskACType
     | addTodolistType | removeTodolistType
     | setTodolistType | setTaskType
+    |setDisableTaskType
 
 
 type removeTaskACType = ReturnType<typeof removeTaskAC>
@@ -96,7 +122,7 @@ export const addTaskAC = (items: TaskType) => {
 }
 
 type changeInputTaskACType = ReturnType<typeof changeUpdateTaskAC>
-export const changeUpdateTaskAC = (todolistID: string, id: string,model:UpdateTaskModelType ) => {
+export const changeUpdateTaskAC = (todolistID: string, id: string, model: UpdateTaskModelType) => {
     return {
         type: 'CHANGE-UPDATE-TASK',
         payload: {
@@ -123,16 +149,69 @@ export const setTaskAC = (tasks: TaskType[], todolistId: string) => {
 }
 
 
+export type setDisableTaskType = ReturnType<typeof setDisableTaskAC>
+
+export const setDisableTaskAC = (todolistID: string,taskId: string,taskDisable: RequestStatusType) => {
+
+    return {
+        type: 'SET-DISABLE-TASK',
+        payload: {
+            todolistID,
+            taskId,
+            taskDisable
+        }
+    } as const
+}
+
+
 export const ThunkTaskGetTC = (todolistId: string) => (dispatch: Dispatch) => {
-    taskAPI.getTasks(todolistId).then((res) => (dispatch(setTaskAC(res.data.items, todolistId))))
+    dispatch(setLoadingAC("loading"))
+    taskAPI.getTasks(todolistId).then((res) => {
+        dispatch(setTaskAC(res.data.items, todolistId))
+        dispatch(setLoadingAC("succeeded"))
+    })
 }
 
 export const ThunkDeleteTaskTC = (todolistId: string, taskId: string) => (dispatch: Dispatch) => {
-    taskAPI.deleteTask(todolistId, taskId).then((res) => (dispatch(removeTaskAC(todolistId, taskId))))
+
+
+    dispatch(setLoadingAC("loading"))
+    dispatch(setDisableTaskAC(todolistId,taskId,"loading"))
+    taskAPI.deleteTask(todolistId, taskId).then((res) => {
+
+
+        dispatch(removeTaskAC(todolistId, taskId))
+        dispatch(setLoadingAC("succeeded"))
+
+    })
+
+        .catch((error)=>{
+            dispatch(setDisableTaskAC(todolistId,taskId,'idle'))
+            handleServerNetworkError(error.message,dispatch)
+        })
+}
+
+enum Result_Code {
+    OK = 0,
+    ERROR = 1,
+    CAPTCHA_ERROR = 10
+
 }
 
 export const ThunkCreateTaskTC = (todolistId: string, title: string) => (dispatch: Dispatch) => {
-    taskAPI.createTask(todolistId, title).then((res) => (dispatch(addTaskAC(res.data.data.item))))
+    dispatch(setLoadingAC("loading"))
+    taskAPI.createTask(todolistId, title).then((res) => {
+
+        if (res.data.resultCode === Result_Code.OK) {
+            const task = res.data.data.item
+            dispatch(addTaskAC(task))
+            dispatch(setLoadingAC('succeeded'))
+        } else {
+
+            handleServerAppError(res.data, dispatch)
+        }
+    })
+
 }
 
 
@@ -143,6 +222,7 @@ export type UpdateTaskType = {
     priority?: TaskPriorities,
     startDate?: string,
     deadline?: string
+    taskDisable?:RequestStatusType
 }
 
 export const ThunkTaskUpdateTC = (todolistId: string, taskId: string, modelTask: UpdateTaskType) => (dispatch: Dispatch, getState: () => AppRootStateType) => {
@@ -161,13 +241,16 @@ export const ThunkTaskUpdateTC = (todolistId: string, taskId: string, modelTask:
         priority: TaskPriorities.Hi,
         title: task.title,
         deadline: task.deadline,
-            ...modelTask
+        taskDisable:task.taskDisable,
+        ...modelTask
 
     }
 
     taskAPI.updateTask(todolistId, taskId, model).then((res) => (
         dispatch(changeUpdateTaskAC(todolistId, taskId, model))))
-
+        .catch((error) => {
+            handleServerNetworkError(error.message, dispatch)
+        })
 }
 
 

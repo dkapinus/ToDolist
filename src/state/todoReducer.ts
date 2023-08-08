@@ -1,13 +1,12 @@
 import {FilterValueType} from "../AppWithRedux";
-import {v1} from "uuid";
 import {Dispatch} from "redux";
 import {todolistAPI, TodolistType} from "../api/todolist-api";
-import {taskAPI} from "../api/task-api";
-import {addTaskAC} from "./taskReducer";
+import {RequestStatusType, setLoadingAC} from "./app-reducer";
+import {handleServerNetworkError} from "../utils/error-utils";
 
-const initialState:TodolistType[]=[]
+const initialState: TodolistType[] = []
 
-export const todoReducer = (state=initialState, action: TsarType): TodolistType[] => {
+export const todoReducer = (state = initialState, action: TsarType): TodolistType[] => {
     switch (action.type) {
         case 'FILTER-TASK': {
             return state.map((el) => el.id === action.payload.todolistID ? {
@@ -25,12 +24,23 @@ export const todoReducer = (state=initialState, action: TsarType): TodolistType[
         }
         case 'ADD-TODOLIST': {
 
-            return [...state, {id: action.payload.todolist.id, title: action.payload.todolist.title, filter: "all",addedDate:'',order:1}]
+            return [...state, {
+                id: action.payload.todolist.id,
+                title: action.payload.todolist.title,
+                filter: "all",
+                addedDate: '',
+                order: 1,
+                entityStatus: 'idle'
+            }]
 
         }
-            case 'SET-TODOLIST' : {
-                return action.payload.data.map((el)=>({...el,filter:'all'}))
-            }
+        case 'SET-TODOLIST' : {
+            return action.payload.data.map((el) => ({...el, filter: 'all',entityStatus:'idle'}))
+        }
+
+        case 'SET-DISABLE' : {
+            return state.map((el)=>el.id===action.payload.todolistID ? {...el,entityStatus:action.payload.entityStatus} : el)
+        }
 
         default:
             return state
@@ -38,7 +48,12 @@ export const todoReducer = (state=initialState, action: TsarType): TodolistType[
 }
 
 
-export type TsarType = filterTasksTodoType | removeTodolistType | changeTodolistNameType | addTodolistType|setTodolistType
+export type TsarType = filterTasksTodoType
+    | removeTodolistType
+    | changeTodolistNameType
+    | addTodolistType
+    | setTodolistType
+    | setDisableType
 
 
 type filterTasksTodoType = ReturnType<typeof filterTasksTodoAC>
@@ -55,7 +70,7 @@ export const filterTasksTodoAC = (todolistID: string, filterValue: FilterValueTy
 
 export type removeTodolistType = ReturnType<typeof removeTodolistAC>
 
-export const removeTodolistAC = (todolistID:string) => {
+export const removeTodolistAC = (todolistID: string) => {
     return {
         type: 'REMOVE-TODOLIST',
         payload: {
@@ -79,12 +94,12 @@ export const changeTodolistNameAC = (todolistID: string, e: string) => {
 
 export type addTodolistType = ReturnType<typeof addTodolistAC>
 
-export const addTodolistAC = ( todolist:TodolistType) => {
+export const addTodolistAC = (todolist: TodolistType) => {
 
     return {
         type: 'ADD-TODOLIST',
         payload: {
-            todolist:todolist,
+            todolist: todolist,
 
         }
     } as const
@@ -92,31 +107,78 @@ export const addTodolistAC = ( todolist:TodolistType) => {
 
 export type setTodolistType = ReturnType<typeof setTodolistAC>
 
-export const setTodolistAC = ( data:TodolistType[]) => {
+export const setTodolistAC = (data: TodolistType[]) => {
 
     return {
         type: 'SET-TODOLIST',
         payload: {
-           data
+            data
 
         }
     } as const
 }
 
-export const ThunkGetStateTC = () => (dispatch:Dispatch)=> {
-    todolistAPI.getTodolist().then((res)=>(dispatch(setTodolistAC(res.data))))
+export type setDisableType = ReturnType<typeof setDisableAC>
+
+export const setDisableAC = (todolistID: string,entityStatus: RequestStatusType) => {
+
+    return {
+        type: 'SET-DISABLE',
+        payload: {
+            todolistID,
+            entityStatus
+        }
+    } as const
 }
 
-export const ThunkDeleteTodoTC = (todolistID:string) => (dispatch:Dispatch)=> {
-    todolistAPI.deleteTodolist(todolistID).then((res)=>(dispatch(removeTodolistAC(todolistID))))
+
+
+
+export const ThunkGetStateTC = () => (dispatch: Dispatch) => {
+    dispatch(setLoadingAC("loading"))
+    todolistAPI.getTodolist().then((res) => {
+            dispatch(setTodolistAC(res.data))
+            dispatch(setLoadingAC("idle"))
+
+        }
+    )
+
 }
 
-export const ThunkCreateTodoTC = (title:string) => (dispatch:Dispatch)=> {
-    todolistAPI.createTodolist(title).then((res)=>(dispatch(addTodolistAC(res.data.data.item))))
+export const ThunkDeleteTodoTC = (todolistID: string) => (dispatch: Dispatch) => {
+
+
+    dispatch(setLoadingAC("loading"))
+    dispatch(setDisableAC(todolistID,'loading'))
+
+    todolistAPI.deleteTodolist(todolistID).then((res) => {
+        dispatch(removeTodolistAC(todolistID))
+        dispatch(setLoadingAC("idle"))
+
+    })
+        .catch((error)=>{
+            dispatch(setDisableAC(todolistID,'idle'))
+            handleServerNetworkError(error.message,dispatch)
+        })
 }
 
-export const ThunkUpdateTodoTC = (todolistID:string,title:string) => (dispatch:Dispatch)=> {
-    todolistAPI.updateTodolist(todolistID,title).then((res)=>(dispatch(changeTodolistNameAC(todolistID,title))))
+export const ThunkCreateTodoTC = (title: string) => (dispatch: Dispatch) => {
+
+    dispatch(setLoadingAC("loading"))
+    todolistAPI.createTodolist(title).then((res) => {
+        dispatch(addTodolistAC(res.data.data.item))
+        dispatch(setLoadingAC("succeeded"))
+    })
+
+}
+
+export const ThunkUpdateTodoTC = (todolistID: string, title: string) => (dispatch: Dispatch) => {
+
+    todolistAPI.updateTodolist(todolistID, title).then((res) => {
+        dispatch(changeTodolistNameAC(todolistID, title))
+
+
+    })
 }
 
 

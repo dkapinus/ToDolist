@@ -19,6 +19,9 @@ import { useSelector} from "react-redux";
 import { AppRootStateType, useAppDispatch} from "./state/store";
 import {TaskStatuses, TaskType} from "./api/task-api";
 import {TodolistType} from "./api/todolist-api";
+import LinearProgress from "@mui/material/LinearProgress";
+import {RequestStatusType} from "./state/app-reducer";
+import {ErrorSnackbar} from "./Components/ErrorSnakeBar";
 
 
 
@@ -37,17 +40,22 @@ function AppWithReducer() {
 
     let task = useSelector<AppRootStateType, TaskKeyType>(state => state.tasks)
 
+    let loading =useSelector<AppRootStateType,RequestStatusType>(state => state.app.status)
+
+
+
+
     const dispatch = useAppDispatch()
 
     useEffect(()=>{
         dispatch(ThunkGetStateTC())
-    },[])
+    },[dispatch])
 
 
 
     const removeTask = useCallback( (todolistID: string, taskId: string) => {
         dispatch(ThunkDeleteTaskTC(todolistID, taskId))
-    },[])
+    },[dispatch])
 
     const filterTasks = useCallback((todolistID: string, filterValue: FilterValueType) => {
         dispatch(filterTasksTodoAC(todolistID, filterValue))
@@ -55,34 +63,36 @@ function AppWithReducer() {
 
     const addTask =useCallback( (todolistID: string, inputValue: string) => {
         dispatch(ThunkCreateTaskTC(todolistID, inputValue))
-    },[])
+    },[dispatch])
 
     const changeStatus =useCallback( (todolistID: string, taskId: string, status:TaskStatuses) => {
         dispatch(ThunkTaskUpdateTC(todolistID, taskId, {status}))
-    },[])
+    },[dispatch])
 
     const removeTodolist =useCallback( (todolistID: string) => {
         dispatch(ThunkDeleteTodoTC(todolistID))
-        dispatch(ThunkDeleteTodoTC(todolistID))
-    },[])
+
+    },[dispatch])
 
     const addTodolist = useCallback((inputValue: string) => {
         let action = ThunkCreateTodoTC(inputValue)
         dispatch(action)
 
-    },[])
+    },[dispatch])
 
     const changeInputTask = useCallback((todolistID: string, id: string, title:string) => {
         dispatch(ThunkTaskUpdateTC(todolistID, id, {title}))
-    },[])
+    },[dispatch])
 
     const changeTodolistName =useCallback( (todolistID: string, e: string) => {
         dispatch(ThunkUpdateTodoTC(todolistID, e))
-    },[])
+    },[dispatch])
 
     return (
         <div className="App">
             <ButtonAppBar/>
+
+            {loading ==='loading' ? <LinearProgress color='secondary' /> : ''}
             <Container fixed>
                 <Grid container style={{padding: '10px'}}>
                     <SuperInput add={addTodolist}/>
@@ -106,17 +116,14 @@ function AppWithReducer() {
                                     removeTodolist={removeTodolist}
                                     callbackChangeInputTask={changeInputTask}
                                     callbackChangeTodolistName={changeTodolistName}
+                                    disable={el.entityStatus}
                                 />
-                                {/*<TodolistWithRedux*/}
-                                {/*    todolistID={el.id}*/}
-                                {/*    title={el.title}*/}
-                                {/*    filter={el.filter}/>*/}
                             </Paper>
 
                         </Grid>
                     })}
                 </Grid>
-
+                <ErrorSnackbar/>
 
             </Container>
 

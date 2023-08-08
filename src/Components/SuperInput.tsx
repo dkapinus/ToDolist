@@ -5,10 +5,11 @@ import TextField from '@mui/material/TextField';
 
 export type SuperInputType = {
     add: (inputValue: string) => void
+    disabled?: boolean
 }
 
 
-export const SuperInput: React.FC<SuperInputType> =memo( ({add, ...props}) => {
+export const SuperInput: React.FC<SuperInputType> = memo(({add, disabled, ...props}) => {
 
 
     let [inputValue, setInputValue] = useState('')
@@ -31,7 +32,9 @@ export const SuperInput: React.FC<SuperInputType> =memo( ({add, ...props}) => {
         if (e.key === 'Enter') {
             addTaskHandler()
         }
-        if (error){ setError('')}
+        if (error) {
+            setError('')
+        }
 
     }
 
@@ -50,15 +53,17 @@ export const SuperInput: React.FC<SuperInputType> =memo( ({add, ...props}) => {
                   value={inputValue}
                   size='small'
                   id="outlined-textarea"
-                  label={error ? error:"Write Text"}
+                  label={error ? error : "Write Text"}
                   placeholder="Write Text"
-
+                  disabled={disabled}
                   onChange={onChangeInput}
                   onKeyDown={onKeyDown}
               />
             <Button variant="contained"
                     style={ButtonStyle}
-                    onClick={addTaskHandler}>+</Button>
+                    onClick={addTaskHandler}
+                    disabled={disabled}
+            >+</Button>
 
         </span>
     );

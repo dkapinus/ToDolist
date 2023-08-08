@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from 'axios'
 import {FilterValueType} from "../AppWithRedux";
+import {RequestStatusType} from "../state/app-reducer";
 
 
 
@@ -45,6 +46,7 @@ export type TodolistType = {
     filter: FilterValueType
     addedDate: string
     order: number
+    entityStatus:RequestStatusType
 
 }
 

@@ -3,6 +3,8 @@ import Checkbox from "@mui/material/Checkbox";
 import s from "./Todolist.module.css"
 import {EditableSpan} from "./Components/EditableSpan";
 import {TaskStatuses, TaskType} from "./api/task-api";
+import {RequestStatusType} from "./state/app-reducer";
+
 
 
 type TasksType = {
@@ -10,11 +12,18 @@ type TasksType = {
     removeTask: ( taskId: string) => void
     changeStatus: (taskId: string, status: TaskStatuses) => void
     callbackChangeInputTask: ( id: string, e: string) => void
+    disable:RequestStatusType
 }
 
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
-export  const Task =memo( ({task,removeTask,changeStatus,callbackChangeInputTask}:TasksType) => {
+export  const Task =memo( ({task,
+                               removeTask,
+                               changeStatus,
+                               callbackChangeInputTask,
+                               disable}:TasksType) => {
+
+
 
 
     const onClickHandlerRemoveTask =useCallback( () => {
@@ -38,9 +47,9 @@ export  const Task =memo( ({task,removeTask,changeStatus,callbackChangeInputTask
             />
 
 
-            <EditableSpan title={task.title} changeEditableSpan={changeInputTask}/>
+            <EditableSpan title={task.title} changeEditableSpan={changeInputTask} disable={disable} />
 
-            <button onClick={onClickHandlerRemoveTask}>X</button>
+            <button onClick={onClickHandlerRemoveTask} disabled={disable==='loading'}>X</button>
         </div>
     );
 })

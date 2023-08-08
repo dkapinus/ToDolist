@@ -1,12 +1,15 @@
 import React, {ChangeEvent, memo, useCallback, useState} from 'react';
+import {RequestStatusType} from "../state/app-reducer";
 
 type EditableSpanType = {
     title: string
     changeEditableSpan: (e:string) => void
+    disable?:RequestStatusType
 }
 
 export const EditableSpan: React.FC<EditableSpanType> =memo( ({
                                                              title, changeEditableSpan,
+                                                             disable,
                                                              ...props
                                                          }) => {
 
@@ -23,8 +26,8 @@ export const EditableSpan: React.FC<EditableSpanType> =memo( ({
 
     return (
         <> {editMode
-            ? <input value={title} onChange={onChangeInputTask} onBlur={ChangeEditMode} autoFocus/>
-            : <span onDoubleClick={ChangeEditMode} >{title}</span>
+            ? <input value={title} onChange={onChangeInputTask} onBlur={ChangeEditMode}  disabled={disable==='loading'}  />
+            : <span onDoubleClick={disable !=='loading' ? ChangeEditMode : ()=>(null)}  >{title}</span>
         }
 
         </>

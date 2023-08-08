@@ -1,4 +1,5 @@
 import axios, { AxiosResponse } from 'axios'
+import {RequestStatusType} from "../state/app-reducer";
 
 
 
@@ -63,6 +64,7 @@ export type TaskType = {
     todoListId: string
     order: number
     addedDate: string
+    taskDisable:RequestStatusType
 }
 export type UpdateTaskModelType = {
     title: string
@@ -71,9 +73,11 @@ export type UpdateTaskModelType = {
     priority: TaskPriorities
     startDate: string
     deadline: string
+    taskDisable:RequestStatusType
 }
 type GetTasksResponse = {
     error: string | null
     totalCount: number
     items: TaskType[]
+
 }
