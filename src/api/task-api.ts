@@ -7,6 +7,9 @@ import {RequestStatusType} from "../state/app-reducer";
      {
          baseURL:`https://social-network.samuraijs.com/api/1.1/`,
          withCredentials: true,
+         headers: {
+             'API-KEY': '489b0bd9-4b11-4a5f-aa40-b75fd80ef8d4'
+         }
      }
  )
 

@@ -1,8 +1,8 @@
-import {FilterValueType} from "../AppWithRedux";
 import {Dispatch} from "redux";
 import {todolistAPI, TodolistType} from "../api/todolist-api";
 import {RequestStatusType, setLoadingAC} from "./app-reducer";
 import {handleServerNetworkError} from "../utils/error-utils";
+import {FilterValueType} from "../Todolists";
 
 const initialState: TodolistType[] = []
 

@@ -6,8 +6,21 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
+import {useSelector} from "react-redux";
+import {AppRootStateType} from "../state/store";
 
-export  function ButtonAppBar() {
+type ButtonAppBarType = {
+    logoutCallback:()=>void
+}
+
+export  const ButtonAppBar:React.FC<ButtonAppBarType>= ({logoutCallback}) =>{
+    const isLoggedIn =useSelector<AppRootStateType,boolean>(state => state.authReducer.isLoggedIn)
+    const login =useSelector<AppRootStateType,string>(state => state.authReducer.user)
+
+    const onClickHandler =()=> {
+        logoutCallback()
+    }
+
     return (
         <Box sx={{ flexGrow: 1 }}>
             <AppBar position="static">
@@ -24,7 +37,10 @@ export  function ButtonAppBar() {
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                         News
                     </Typography>
-                    <Button color="inherit">Login</Button>
+
+                     <Button color="inherit" onClick={onClickHandler}>{login}</Button>
+
+
                 </Toolbar>
             </AppBar>
         </Box>

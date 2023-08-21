@@ -1,5 +1,4 @@
 import React, {memo, useCallback, useEffect} from 'react';
-import {FilterValueType} from "./AppWithRedux";
 import {SuperInput} from "./Components/SuperInput";
 import {EditableSpan} from "./Components/EditableSpan";
 import IconButton from '@mui/material/IconButton';
@@ -10,6 +9,7 @@ import {TaskStatuses, TaskType} from "./api/task-api";
 import {ThunkTaskGetTC} from "./state/taskReducer";
 import {useAppDispatch} from "./state/store";
 import {RequestStatusType} from "./state/app-reducer";
+import {FilterValueType} from "./Todolists";
 
 
 type TodolistType = {
@@ -106,7 +106,7 @@ export const Todolist: React.FC<TodolistType> = memo(({
                         removeTask={onClickHandlerRemoveTask}
                         changeStatus={onChangeStatus}
                         callbackChangeInputTask={changeInputTask}
-                       disable={el.taskDisable}
+                        disable={el.taskDisable}
 
                     />
 
@@ -135,5 +135,4 @@ export const Todolist: React.FC<TodolistType> = memo(({
     )
         ;
 })
-
 

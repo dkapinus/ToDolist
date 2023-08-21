@@ -1,10 +1,10 @@
-import {TaskKeyType} from "../AppWithRedux";
-import {addTodolistType, removeTodolistType, setDisableAC, setTodolistType} from "./todoReducer";
+import {addTodolistType, removeTodolistType,  setTodolistType} from "./todoReducer";
 import {Dispatch} from "redux";
 import {taskAPI, TaskPriorities, TaskStatuses, TaskType, UpdateTaskModelType} from "../api/task-api";
 import {AppRootStateType} from "./store"
 import {RequestStatusType, setLoadingAC} from "./app-reducer";
 import {handleServerAppError, handleServerNetworkError} from "../utils/error-utils";
+import {TaskKeyType} from "../Todolists";
 
 
 const initialState: TaskKeyType = {}
@@ -20,6 +20,7 @@ export const taskReducer = (state = initialState, action: TsarType): TaskKeyType
             return StateCopy
         }
         case 'SET-TASK' : {
+
             return {...state, [action.payload.todolistId]: action.payload.tasks}
         }
         case 'REMOVE-TASK': {
@@ -165,6 +166,7 @@ export const setDisableTaskAC = (todolistID: string,taskId: string,taskDisable: 
 
 
 export const ThunkTaskGetTC = (todolistId: string) => (dispatch: Dispatch) => {
+
     dispatch(setLoadingAC("loading"))
     taskAPI.getTasks(todolistId).then((res) => {
         dispatch(setTaskAC(res.data.items, todolistId))
@@ -191,7 +193,7 @@ export const ThunkDeleteTaskTC = (todolistId: string, taskId: string) => (dispat
         })
 }
 
-enum Result_Code {
+export enum Result_Code {
     OK = 0,
     ERROR = 1,
     CAPTCHA_ERROR = 10
