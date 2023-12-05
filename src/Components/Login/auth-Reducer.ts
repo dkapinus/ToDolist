@@ -57,16 +57,16 @@ export const loginTC = (data: LoginType) => async (dispatch: Dispatch<ActionsTyp
 }
 
 export const SetLoginStatusTC = () => async (dispatch: Dispatch<ActionsType>) => {
-  console.log(4)
+
     try {
         dispatch(setLoadingAC('loading'))
         const res = await authAPI.getAuth()
       
         if (res.data.resultCode === Result_Code.OK) {
-            console.log(6)
+
             dispatch(setIsLoggedInAC(true))
-            // console.log(res.data.data.item.login)
-            console.log(7)
+
+
              dispatch(setUserAC(res.data.data.login))
             dispatch(setLoadingAC('succeeded'))
 

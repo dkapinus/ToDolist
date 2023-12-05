@@ -15,7 +15,7 @@ import {useSelector} from "react-redux";
 function AppWithReducer() {
 
 
-console.log(1)
+
 
 
 
@@ -26,13 +26,13 @@ console.log(1)
     const dispatch =useAppDispatch()
 
     useEffect(() => {
-     console.log(2)
+
         dispatch(SetLoginStatusTC())
     }, [dispatch])
 
 
 
-    console.log(3)
+
     if (!isInitialized) {
 
         return <div

@@ -36,7 +36,7 @@ export type TaskKeyType = {
 }
 
  export  const  Todolists = ()=> {
-console.log(8)
+
 
     let todolists = useSelector<AppRootStateType, TodolistType[]>(state => state.todolists)
 
@@ -100,7 +100,7 @@ console.log(8)
      },[dispatch])
 
      if (!isLogin) return <Navigate to={"/login"}/>
-console.log(9)
+
     return (
         <div className="App">
             <ButtonAppBar logoutCallback={Logout}/>
@@ -114,7 +114,7 @@ console.log(9)
 
                     {todolists.map((el) => {
 
-                        return <Grid item>
+                        return <Grid item key={el.id}>
                             <Paper elevation={6} style={{padding: '10px'}}>
                                 <Todolist
                                         key={el.id}
