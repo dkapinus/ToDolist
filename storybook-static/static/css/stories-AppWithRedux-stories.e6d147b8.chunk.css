@@ -1,0 +1,30 @@
+
+/*.App {*/
+/*  padding: 30px;*/
+/*  display: flex;*/
+/*}*/
+
+/*.App > div {*/
+/*  margin-right: 50px;*/
+/*}*/
+
+
+
+.Todolist_error__4J9cB {
+    border: red 1px solid;
+}
+
+.Todolist_errorMessage__aMVGx {
+    color: red;
+}
+
+.Todolist_activeFilter__HDWKE {
+    background-color: aquamarine;
+}
+
+.Todolist_isDone__A95DX {
+    opacity: 0.5;
+}
+
+
+/*# sourceMappingURL=stories-AppWithRedux-stories.e6d147b8.chunk.css.map*/
