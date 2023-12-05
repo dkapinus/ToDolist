@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import './App.css';
 import {Login} from "./Components/Login/Login";
-import {BrowserRouter, Navigate, Route, Routes} from "react-router-dom";
+import {BrowserRouter, HashRouter, Navigate, Route, Routes} from "react-router-dom";
 import {Todolists} from "./Todolists";
 import {SetLoginStatusTC} from "./Components/Login/auth-Reducer";
 import {AppRootStateType, useAppDispatch} from "./state/store";
@@ -44,14 +44,14 @@ function AppWithReducer() {
     return (
         <div>
 
-            <BrowserRouter>
+            <HashRouter>
                                 <Routes>
                                     <Route path={"/"} element={<Todolists/>}/>
                                     <Route path={"/login"} element={<Login/>}/>
                                     <Route path={"/404"} element={<h1>{'404 Page not founded'}</h1>}/>
                                     <Route path={'/*'} element={<Navigate to={"/404"}/>} />
                                 </Routes>
-                </BrowserRouter>
+                </HashRouter>
 
 
         </div>
